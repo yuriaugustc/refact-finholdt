@@ -1,0 +1,170 @@
+<div class="grid h-full-12">
+  <div class="col-12 lg:h-full lg:flex align-items-stretch gap-3">
+    <div class="col-12 lg:col-3 p-0 mb-5 lg:mb-0 overflow-hidden">
+      <div class="card">
+        <div class="flex flex-column align-items-center">
+          <div class="my-2 border-circle w-10rem h-10rem lg:w-9rem lg:h-9rem overflow-hidden flex align-items-center justify-content-center">
+            <p-image 
+              [src]="userService.userProfile?.foto" 
+              alt="Perfil" 
+              width="200" 
+              [preview]="true"
+            ></p-image>
+          </div>
+          <div class="my-2 text-700 text-xl">{{ userService.userProfile?.apelido }}</div>
+          <div class="mb-2 text-500 text-md"><i>{{ userService.userProfile?.login?.login }}</i></div>
+          <div class="my-2 text-700 text-xl">{{ userService.userProfile?.nivel_acesso?.nome }}</div>
+          <div class="mb-2 text-500 text-md">
+            <p-button icon="pi pi-key" iconPos="right" [rounded]="true" label="Alterar Senha" [text]="true" (onClick)="modalPassword()" />
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="flex align-items-center justify-content-center mb-2">
+          <span class="text-900 text-sm">Informações Adicionais</span>
+        </div>
+        <div class="flex flex-column">
+          <div class="text-900 text-sm m-2">
+            <b>Nome Completo:</b>
+            <span class="mx-2">{{ userService.userProfile?.nome_completo }}</span>
+          </div>
+          <div class="text-900 text-sm m-2">
+            <b>CPF:</b>
+            <span class="mx-2">{{ userService.userProfile?.cpf }}</span>
+          </div>
+          <div class="text-900 text-sm m-2">
+            <b>Email:</b>
+            <span class="mx-2">{{ userService.userProfile?.email }}</span>
+          </div>
+          <div class="text-900 text-sm m-2">
+            <b>Celular:</b>
+            <span class="mx-2">{{ userService.userProfile?.celular }}</span>
+          </div>  
+        </div>
+      </div>
+    </div>
+    <div class="card col-12 lg:col-9 overflow-hidden">
+      <div class="mt-2 mb-5 mr-1 text-900 font-medium text-xl" [innerHTML]="title"></div>
+      <p-timeline [value]="consultancyService.consultancies" [align]="'alternate'" styleClass="customized-timeline">
+        <ng-template pTemplate="marker">
+          <span 
+            class="flex z-1 w-2rem h-2rem align-items-center justify-content-center text-white border-circle shadow-2"
+            [style.backgroundColor]="'var(--primary-color)'"
+            >
+            <i ngClass="bi bi-send"></i>
+          </span>
+        </ng-template>
+        <ng-template pTemplate="content" let-consultancy>
+          <p-card 
+          class="cursor-pointer"
+          [header]="consultancy.tipo_assessoria.nome" 
+          [subheader]="consultancy.data_contratacao.toLocaleString()"
+          (click)="openModal(consultancy.id)">
+            <div class="line-height-1">
+              <b><i class="pi pi-user"></i></b> {{ consultancy.cliente.nome_completo }}
+            </div>
+          </p-card>
+        </ng-template>
+      </p-timeline>
+      <app-consultancy-modal 
+			[consultancy]="consultancyService.consultancy_view ?? { }"
+			[(visible)]="showModal"
+			></app-consultancy-modal>
+      <p-dialog
+			styleClass="p-fluid"
+			[style]="{ width: '50rem' }"
+			[(visible)]="showModalPassword"
+			header="Alterar Senha:"
+			[modal]="true"
+			[draggable]="true"
+			[closable]="true"
+			[dismissableMask]="true"
+      [closeOnEscape]="false"
+		  >
+			<ng-template pTemplate="content">
+        <div class="formgrid grid p-fluid">
+          <div class="field col-12">
+            <label for="old_password">Senha Atual</label>
+            <p-password 
+              inputId="old_password"
+              [(ngModel)]="old_password"
+              [toggleMask]="true"
+              [feedback]="false"
+              [ngClass]="{'ng-invalid ng-dirty' : submitted && !old_password }"
+              >
+            </p-password>
+            <small
+              class="p-error"
+              *ngIf="submitted && !old_password"
+            >
+              Preencha sua senha anterior.
+            </small>
+          </div>
+          <div class="field col-12">
+            <label for="new_password">Nova Senha</label>
+            <p-password 
+              inputId="new_password"
+              [(ngModel)]="new_password"
+              [toggleMask]="true"
+              [mediumRegex]="regex_medium"
+              [strongRegex]="regex_strong"
+              appendTo="body"
+              autocomplete="true"
+              [ngClass]="{'ng-invalid ng-dirty' : submitted && !new_password }"
+              >
+                <ng-template pTemplate="header">
+                    <h6>Preencha sua nova senha</h6>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <p-divider />
+                    <p class="mt-2">Requisitos</p>
+                    <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+                        <li>Ao menos uma letra minúscula.</li>
+                        <li>Ao menos uma letra maiúscula.</li>
+                        <li>Ao menos um número.</li>
+                        <li>Ao menos um caractere especial.</li>
+                        <li>Mínimo 8 caracteres.</li>
+                    </ul>
+                </ng-template>
+            </p-password>
+          </div>
+          <div class="field col-12">
+            <label for="old_password">Confirmar nova senha</label>
+            <p-password 
+              [(ngModel)]="confirm_password"
+              [toggleMask]="true"
+              [feedback]="false"
+              [ngClass]="{'ng-invalid ng-dirty' : new_password && (new_password != confirm_password) }"
+              >
+            </p-password>
+            <small
+              class="p-error"
+              *ngIf="new_password && (new_password != confirm_password)"
+            >
+              As senhas não coincidem.
+            </small>
+          </div>
+        </div>
+			</ng-template>
+			<ng-template pTemplate="footer">
+				<p-button
+					pRipple
+          [rounded]="true"
+					label="Cancelar"
+					icon="pi pi-times"
+					class="p-button-text"
+					(click)="closeModalPassword()"
+				></p-button>
+				<button
+					pButton
+					pRipple
+					label="Salvar"
+					icon="pi pi-check"
+					class="p-button-text"
+					(click)="onSavePassword()"
+				></button>
+			</ng-template>
+		  </p-dialog>
+    </div>
+  </div>
+</div>

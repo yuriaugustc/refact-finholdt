@@ -1,0 +1,134 @@
+<div class="container-fluid-md h-screen text-center overflow-hidden bg-white">
+	<div class="grid grid-nogutter h-screen align-items-stretch">
+		<div class="col-8 container-img sm:h-screen">
+			<div class="h-full w-full overflow-hidden">
+				<img
+					class="img-fluid bg-cover bg-center min-w-full h-full"
+					src="assets/imgs/carousel/imagem1.png"
+				/>
+			</div>
+		</div>
+		<div
+			class="col-12 lg:col-4 flex justify-content-center align-items-center"
+			style="background-color: transparent"
+		>
+			<div pFocusTrap class="card border-0 w-9">
+				<div class="text-center my-5">
+					<img
+						src="assets/imgs/logo.png"
+						alt="Image"
+						height="75"
+						class="mb-3"
+					/>
+					<div class="text-900 fs-3 font-medium mb-3">Bem vindo de volta!</div>
+					<!-- <div class="me-5 text-end">
+						<span class="text-600 font-medium line-height-3"
+							>Não tem conta?</span
+						>
+						<a
+							class="font-medium no-underline ml-2 text-blue-500 cursor-pointer"
+							role="button"
+							[routerLink]="'/signup'"
+							>Crie uma agora!</a
+						>
+					</div> -->
+				</div>
+				<div class="p-fluid">
+					<div class="field mx-5 mb-4">
+						<span class="p-float-label">
+							<input
+								pInputText
+								id="username"
+								[(ngModel)]="usuario"
+								(keydown.enter)="signIn()"
+								autofocus
+							/>
+							<label for="username">Usuário / CPF / Email</label>
+						</span>
+					</div>
+					<div class="field mx-5 mb-3">
+						<span class="p-float-label">
+							<p-password
+								[(ngModel)]="senha"
+								[feedback]="false"
+								[toggleMask]="true"
+								(keydown.enter)="signIn()"
+							></p-password>
+							<label for="password">Senha</label>
+						</span>
+					</div>
+					<div class="mx-5 mb-5">
+						<div class="flex align-items-center justify-content-between">
+							<p-checkbox
+								id="rememberMe"
+								[(ngModel)]="manter_conectado"
+								[binary]="true"
+								class="mr-2"
+								label="Mantenha-me Conectado"
+								(keydown.enter)="manter_conectado = !manter_conectado"
+							></p-checkbox>
+							<a
+								class="font-medium no-underline text-blue-500 text-right cursor-pointer"
+								role="button"
+								(click)="toggleModal()"
+								>Esqueceu a senha?</a
+							>
+						</div>
+					</div>
+					<div class="flex align-items-center justify-content-center mx-5 mb-5">
+						<button
+							pButton
+							pRipple
+							label="Entrar"
+							icon="pi pi-user"
+							iconPos="right"
+							class="w-50 rounded"
+							(click)="signIn()"
+							(keydown.enter)="signIn()"
+						></button>
+					</div>
+				</div>
+			</div>
+			<p-dialog
+				styleClass="p-fluid"
+				[style]="{ width: '50rem' }"
+				[(visible)]="modal_esqueci_minha_senha"
+				[header]="'Esqueci minha Senha'"
+				[modal]="true"
+				[draggable]="true"
+				[closable]="true"
+				[closeOnEscape]="true"
+				[dismissableMask]="true"
+			>
+				<ng-template pTemplate="content">
+					<div class="field mt-2">
+						<label for="email"
+							>Confirme o e-mail vinculado à conta da qual está tentando
+							acessar:</label
+						>
+						<input
+							pInputText
+							id="email"
+							[(ngModel)]="email"
+							[required]="true"
+							[autofocus]="true"
+						/>
+						<small class="p-error" *ngIf="submitted && !email"
+							>Preencha um email válido.</small
+						>
+					</div>
+				</ng-template>
+				<ng-template pTemplate="footer">
+					<button
+						pButton
+						pRipple
+						label="Enviar"
+						icon="pi pi-check"
+						class="p-button-text"
+						(click)="forgotPassword()"
+					></button>
+				</ng-template>
+			</p-dialog>
+		</div>
+	</div>
+</div>

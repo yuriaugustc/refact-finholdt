@@ -1,0 +1,522 @@
+<div class="grid">
+	<p-confirmPopup></p-confirmPopup>
+	<div class="col-12">
+		<div class="mx-2 py-2">
+			<h4>
+				<i class="bi bi-person-lines-fill"></i>
+				Gerenciamento de Usuários
+			</h4>
+		</div>
+		<div class="card">
+			<p-table
+				#table
+				dataKey="id"
+				[value]="userService.users"
+				[loading]="loading"
+				[lazy]="true"
+				(onLazyLoad)="userService.loadUsers($event)"
+				[paginator]="true"
+				[rows]="10"
+				[totalRecords]="userService.totalRecords"
+				[showCurrentPageReport]="true"
+				currentPageReportTemplate="{first} a {last} de {totalRecords} usuário(s)"
+				stateStorage="session"
+				stateKey="crud-users"
+				[(selection)]="selectedUsers"
+				[rowHover]="true"
+				[tableStyle]="{ 'min-width': '50rem' }"
+				[styleClass]="'p-datatable-sm'"
+			>
+				<ng-template pTemplate="caption">
+					<div class="flex flex-wrap gap-3 justify-content-start">
+						<p-button
+							pTooltip="Criar novo usuário"
+							tooltipPosition="top"
+							appendTo="body"
+							icon="pi pi-user-plus"
+							class="btn"
+							[rounded]="true"
+							[outlined]="true"
+							severity="success"
+							[style]="{ 'border-radius': '10px' }"
+							(click)="openModal({ id: 0 }, 'create')"
+						>
+						</p-button>
+						<p-button
+							pTooltip="Inativar usuário(s) selecionado(s)"
+							tooltipPosition="top"
+							appendTo="body"
+							icon="pi pi-user-minus"
+							class="btn"
+							(click)="deleteSelectedUsers($event)"
+							[rounded]="true"
+							[outlined]="true"
+							severity="danger"
+							[style]="{ 'border-radius': '10px' }"
+							[disabled]="!selectedUsers || !selectedUsers.length"
+						>
+						</p-button>
+					</div>
+				</ng-template>
+				<ng-template pTemplate="header">
+					<tr>
+						<th style="width: 4rem">
+							<p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+						</th>
+						<th pSortableColumn="nome_completo">
+							Nome Completo <p-sortIcon field="nome"></p-sortIcon>
+						</th>
+						<th pSortableColumn="apelido">
+							Apelido
+							<i
+								class="bi bi-info-circle me-2"
+								role="button"
+								pTooltip="Este é um campo utilizado pelo sistema para não utilizar o nome completo do usuário ao interagir com o mesmo."
+								tooltipPosition="top"
+								appendTo="body"
+							></i>
+							<p-sortIcon field="apelido"></p-sortIcon>
+						</th>
+						<th pSortableColumn="login">
+							Login <p-sortIcon field="login"></p-sortIcon>
+						</th>
+						<th pSortableColumn="cpf">
+							CPF <p-sortIcon field="cpf"></p-sortIcon>
+						</th>
+						<th pSortableColumn="email">
+							Email <p-sortIcon field="email"></p-sortIcon>
+						</th>
+						<th pSortableColumn="celular">
+							Celular <p-sortIcon field="celular"></p-sortIcon>
+						</th>
+						<th pSortableColumn="nivel_acesso">
+							Nível de Acesso <p-sortIcon field="nivel_acesso"></p-sortIcon>
+						</th>
+						<th pSortableColumn="ativo">
+							Ativo <p-sortIcon field="ativo"></p-sortIcon>
+						</th>
+						<th>Ações</th>
+					</tr>
+					<tr>
+						<th></th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="nome_completo"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body"
+							>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="login"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body"
+							>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="apelido"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body"
+							>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="cpf"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body"
+							>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="email"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body"
+							>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="celular"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body"
+							>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="nivel_acesso"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body"
+							>
+								<ng-template pTemplate="filter" let-value let-filter="filterCallback">
+									<p-multiSelect
+										inputId="filter_access_levels"
+										[options]="userService.accessLevels"
+										[ngModel]="value"
+										optionLabel="nivel_acesso"
+										optionValue="id"
+										(onChange)="filter($event.value)"
+										[style]="{ width: '100%' }"
+										appendTo="body"
+									>
+									</p-multiSelect>
+								</ng-template>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="boolean"
+								field="ativo"
+								matchMode="equals"
+								[showMenu]="false"
+							>
+							</p-columnFilter>
+						</th>
+						<th></th>
+					</tr>
+				</ng-template>
+				<ng-template pTemplate="body" let-user>
+					<tr>
+						<td>
+							<p-tableCheckbox [value]="user"></p-tableCheckbox>
+						</td>
+						<td>{{ user.nome_completo }}</td>
+						<td>{{ user.apelido }}</td>
+						<td>{{ user.login }}</td>
+						<td>{{ user.cpf }}</td>
+						<td>{{ user.email }}</td>
+						<td>{{ user.celular }}</td>
+						<td>{{ user.nivel_acesso }}</td>
+						<td>
+							<i
+								class="pi"
+								[ngClass]="
+									user.ativo == 1
+										? 'text-green-500 pi-check-circle text-success'
+										: 'text-red-500 pi-times-circle text-danger'
+								"
+							></i>
+						</td>
+						<td>
+							<div class="flex align-items-center justify-content-center gap-2">
+								<button
+									pButton
+									pRipple
+									type="button"
+									icon="pi pi-pencil"
+									(click)="openModal(user, 'edit')"
+									class="p-button-rounded p-button-text mr-2"
+								></button>
+							</div>
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		</div>
+		<p-dialog
+			styleClass="p-fluid"
+			[style]="{ width: '50rem' }"
+			[(visible)]="showModal"
+			[header]="userService.selectedUser.id ? 'Editar usuário:' : 'Criar Usuário:'"
+			[modal]="true"
+			[draggable]="true"
+			[closable]="true"
+			[dismissableMask]="true"
+		>
+			<ng-template pTemplate="content">
+				<div class="field">
+					<label for="nome">Nome Completo</label>
+					<input
+						type="text"
+						pInputText
+						id="nome"
+						[(ngModel)]="userService.selectedUser.nome_completo"
+						required
+						autofocus
+					/>
+					<small
+						class="p-error"
+						*ngIf="submitted && !userService.selectedUser.nome_completo"
+						>Nome é obrigatório.</small
+					>
+				</div>
+	
+				<div class="field">
+					<label for="apelido">Apelido</label>
+					<input
+						type="text"
+						pInputText
+						id="apelido"
+						[(ngModel)]="userService.selectedUser.apelido"
+						required
+					/>
+					<small
+						class="p-error"
+						*ngIf="submitted && !userService.selectedUser.apelido"
+						>O Apelido é obrigatório. Pode ser apenas o primeiro nome do usuário
+						(ou os dois primeiros em caso de nomes compostos)</small
+					>
+				</div>
+	
+				<div class="field">
+					<label for="login">
+						Login
+						<i
+							class="bi bi-info-circle"
+							pTooltip="Este será o login que o usuário utilizará para entrar no sistema, não pode ser modificado após a criação. Utilize sabiamente!" 
+							tooltipPosition="top"
+							appendTo="body"
+						></i>
+					</label>
+					<p-inputGroup>
+						<input
+							type="text"
+							pInputText
+							id="login"
+							[(ngModel)]="userService.selectedUser.login"
+							required
+							[disabled]="userService.selectedUser.id != 0"
+							(blur)="checkUser(1)"
+						/>
+						<p-button
+							[style]="{ 'border-radius': '0px 10px 10px 0px' }"
+							icon="pi pi-key"
+							[rounded]="true"
+							severity="success"
+							*ngIf="userService.selectedUser.id"
+							[disabled]="userService.selectedUser.senha_padrao ?? false"
+							(onClick)="changePassword($event)"
+							[pTooltip]="
+								userService.selectedUser.senha_padrao
+								? 'Este usuário já se encontra com a senha padrão.'
+								: 'Resetar senha'
+							"
+							tooltipPosition="top"
+							appendTo="body"
+						></p-button>
+					</p-inputGroup>
+					<small
+						class="p-error"
+						*ngIf="loginInvalid"
+						>Este login já existe.</small>
+					<small
+						class="p-error"
+						*ngIf="submitted && !userService.selectedUser.login"
+						>O login é obrigatório.</small
+					>
+				</div>
+	
+				<div class="field">
+					<label for="cpf">CPF</label>
+					<p-inputMask 
+						id="cpf"
+						mask="999.999.999-99"
+						[unmask]="true"
+						[(ngModel)]="userService.selectedUser.cpf"
+						[required]="true"
+						[maxlength]="11"
+						[minlength]="11"
+						(onComplete)="checkUser(2)"
+					/>
+					<small
+						class="p-error"
+						*ngIf="cpfInvalid"
+						>Este CPF já foi cadastrado anteriormente.</small>
+					<small
+						class="p-error"
+						*ngIf="
+							(submitted && !userService.selectedUser.cpf) ||
+							this.userService.selectedUser.cpf?.length != 11
+						"
+					>CPF deve conter 11 dígitos.</small>
+					<small
+						class="p-error"
+						*ngIf="submitted && !userService.selectedUser.cpf"
+					>CPF é obrigatório.</small>
+				</div>
+	
+				<div class="field">
+					<label for="email">Email</label>
+					<input
+						type="text"
+						pInputText
+						id="email"
+						[(ngModel)]="userService.selectedUser.email"
+						required
+						(blur)="checkUser(3)"
+						(input)="validateEmailInput($event)"
+						(keypress)="allowEmailCharacters($event)"
+					/>
+					<small
+						class="p-error"
+						*ngIf="emailInvalid"
+						>Este Email já foi cadastrado anteriormente.</small>
+					<small
+						class="p-error"
+						*ngIf="submitted && !userService.selectedUser.email"
+						>Email é obrigatório.</small
+					>
+				</div>
+	
+				<div class="field">
+					<label for="celular">Celular</label>
+					<p-inputMask 
+						id="cpf"
+						mask="(99) 9 9999-9999"
+						[unmask]="true"
+						[(ngModel)]="userService.selectedUser.celular"
+						[required]="true"
+						[maxlength]="11"
+						[minlength]="11"
+						(onComplete)="checkUser(2)"
+					/>
+					<small
+						class="p-error"
+						*ngIf="
+							(submitted && !userService.selectedUser.celular) ||
+							this.userService.selectedUser.celular?.length != 11
+						"
+						>Celular deve conter 11 dígitos (ddd9xxxxxxxx)</small
+					>
+					<small
+						class="p-error"
+						*ngIf="submitted && !userService.selectedUser.celular"
+						>Celular é obrigatório.</small
+					>
+				</div>
+	
+				<div class="field">
+					<label for="nivel_acesso_item">Nivel de Acesso</label>
+					<p-dropdown
+						emptyFilterMessage="Nenhum resultado encontrado."
+						emptyMessage="Nenhum resultado encontrado"
+						[(ngModel)]="userService.selectedUser.id_nivel_acesso"
+						inputId="nivel_acesso_item"
+						[options]="userService.accessLevels"
+						optionLabel="nivel_acesso"
+						optionValue="id"
+						appendTo="body"
+						[disabled]="isComercialRole()"
+					>
+					</p-dropdown>
+				</div>
+				<div class="field" *ngIf="userService.selectedUser.id">
+					<label for="ativo">Ativo</label>
+					<p-dropdown
+						inputId="ativo"
+						[options]="options"
+						[(ngModel)]="userService.selectedUser.ativo"
+						optionLabel="label"
+						optionValue="value"
+						(onChange)="changeActiveItem($event)"
+					>
+						<ng-template pTemplate="selectedItem">
+							<p-tag [severity]="activeItem.severity">{{ activeItem.label }}</p-tag>
+						</ng-template>
+						<ng-template let-option pTemplate="item">
+							<p-tag [severity]="option.severity">{{ option.label }}</p-tag>
+						</ng-template>
+					</p-dropdown>	
+				</div>
+				<div class="field">
+					<label for="profilePic" class="form-label">Foto de Perfil</label>
+					<p-inputGroup>
+						<p-fileUpload 
+							#fu
+							class="mx-2"
+							mode="basic" 
+							chooseLabel="Procurar..." 
+							chooseIcon="pi pi-upload"
+							id="profilePic"
+							name="profilePic"
+							accept="image/*" 
+							[maxFileSize]="10000000"
+							(onSelect)="onUpload($event)" />
+						<p-button
+							class="mx-2"
+							[style]="{ 'border-radius': '50%' }"
+							icon="pi pi-times"
+							[rounded]="true"
+							[text]="true"
+							severity="danger"
+							*ngIf="fu.hasFiles()"
+							(onClick)="fu.clear()"
+							pTooltip="Limpar foto selecionada"
+							tooltipPosition="top"
+						></p-button>
+						<p-button
+							class="mx-2"
+							[style]="{ 'border-radius': '50%' }"
+							icon="pi pi-image"
+							[rounded]="true"
+							[text]="true"
+							*ngIf="userService.selectedUser.id"
+							(onClick)="op.toggle($event)"
+							pTooltip="Ver foto de perfil atual"
+							tooltipPosition="top"
+						></p-button>
+						<p-overlayPanel #op>
+							<img
+								src="{{ userService.selectedUser.foto }}"
+								alt="profile perfil"
+								width="300"
+								height="300"
+							/>
+						</p-overlayPanel>
+					</p-inputGroup>
+				</div>
+			</ng-template>
+			<ng-template pTemplate="footer">
+				<button
+					pButton
+					pRipple
+					label="Cancelar"
+					icon="pi pi-times"
+					class="p-button-text"
+					(click)="closeModal()"
+				></button>
+				<button
+					pButton
+					pRipple
+					label="Salvar"
+					icon="pi pi-check"
+					class="p-button-text"
+					(click)="onSave()"
+				></button>
+			</ng-template>
+		</p-dialog>
+	</div>
+</div>

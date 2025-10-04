@@ -1,0 +1,136 @@
+<div class="grid">
+	<div class="col-12">
+		<div pFocusTrap class="card">
+			<div class="p-fluid mb-2">
+				<div class="field col mb-0">
+					<label for="selectConsultancyType"
+						>Selecione o tipo de assessoria</label>
+					<p-dropdown
+						inputId="selectConsultancyType"
+						[options]="consultancyService.consultancyTypes"
+						[(ngModel)]="consultancyService.consultancy.id_tipo_assessoria"
+						[required]="true"
+						[autofocus]="true"
+						[style]="{ width: '100%' }"
+						appendTo="body"
+						optionLabel="nome"
+						optionValue="id"
+						placeholder="Selecione..."
+						(onChange)="formService.loadFormsByConsultancyType($event.value)"
+						[tabindex]="0"
+					></p-dropdown>
+					<small
+						class="p-error"
+						*ngIf="
+							submitted &&
+							consultancyService.consultancy.id_tipo_assessoria == 0
+						"
+						>Selecione o tipo da assessoria.</small>
+				</div>
+				<div class="field col mb-0"
+					*ngIf="consultancyService.checkConsultancyTypeStrict()"
+				>
+					<label for="selectConsultancyType">Selecione o tipo do visto</label>
+					<p-dropdown
+						inputId="selectConsultancyType"
+						[options]="consultancyService.visaTypes"
+						[(ngModel)]="consultancyService.consultancy.id_tipo_visto"
+						[required]="true"
+						[autofocus]="true"
+						[style]="{ width: '100%' }"
+						appendTo="body"
+						optionLabel="nome"
+						optionValue="id"
+						placeholder="Selecione..."
+						[tabindex]="1"
+					></p-dropdown>
+					<small
+						class="p-error"
+						*ngIf="
+							submitted &&
+							consultancyService.checkConsultancyTypeStrict() &&
+							consultancyService.consultancy.id_tipo_visto == 0
+						"
+						>Selecione o tipo do visto.</small>
+				</div>
+				<div class="field col mb-0"
+					*ngIf="consultancyService.checkConsultancyTypeCountry()"
+				>
+					<label for="selectConsultancyType">Selecione o país de destino</label>
+					<p-dropdown
+						inputId="selectConsultancyType"
+						[options]="consultancyService.countries"
+						[(ngModel)]="consultancyService.consultancy.id_pais"
+						[required]="true"
+            [filter]="true"
+						[style]="{ width: '100%', height: '100%' }"
+						appendTo="body"
+						optionLabel="nome"
+						optionValue="id"
+						placeholder="Selecione..."
+					>
+						<ng-template let-country pTemplate="selectedItem">
+							<div class="flex align-items-center gap-2" *ngIf="country">
+								<img [src]="country.codigo" class="flag" style="width: 18px" />
+								<div>{{ country.nome }}</div>
+							</div>
+						</ng-template>
+						<ng-template let-country pTemplate="item">
+							<div class="flex align-items-center gap-2">
+								<img [src]="country.codigo" class="flag" style="width: 18px" />
+								<div>{{ country.nome }}</div>
+							</div>
+						</ng-template>
+					</p-dropdown>
+					<small
+						class="p-error"
+						*ngIf="
+							submitted &&
+							consultancyService.checkConsultancyType() &&
+							consultancyService.consultancy.id_pais == 0
+						">Selecione o pais de destino.</small>
+				</div>
+				<div class="field col mb-0">
+					<label for="selectForm">Selecione o formulário de preenchimento</label>
+					<p-dropdown
+						inputId="selectForm"
+						[options]="formService.forms"
+						[(ngModel)]="consultancyService.consultancy.id_formulario"
+						[required]="true"
+						[style]="{ width: '100%' }"
+						appendTo="body"
+						optionLabel="nome"
+						optionValue="id"
+						placeholder="Selecione..."
+					></p-dropdown>
+					<small
+						class="p-error"
+						*ngIf="
+							submitted &&
+							consultancyService.consultancy.id_formulario == 0
+						">Selecione o formulario de preenchimento.</small>
+				</div>
+			</div>
+			<div class="w-full flex flex-row-reverse justify-content-between">
+				<p-button
+					label="Próximo"
+					icon="pi pi-chevron-right"
+					iconPos="right"
+					[text]="true"
+					[rounded]="true"
+					(onClick)="check()"
+				>
+				</p-button>
+				<p-button
+					label="Anterior"
+					icon="pi pi-chevron-left"
+					iconPos="left"
+					[text]="true"
+					[rounded]="true"
+					(onClick)="consultancyService.firstStep()"
+				>
+				</p-button>
+			</div>
+		</div>
+	</div>
+</div>

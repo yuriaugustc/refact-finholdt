@@ -1,0 +1,67 @@
+<div class="grid">
+  <div class="col-12">
+    <div pFocusTrap class="card">
+      <div class="field">
+        <label for="selectUser">Cliente da assessoria</label>
+        <p-dropdown
+          [options]="userService.costumers"
+          [filter]="true"
+          [(ngModel)]="consultancyService.consultancy.id_cliente"
+          placeholder="Selecione um cliente..."
+          optionLabel="nome_completo"
+          optionValue="id"
+          inputId="selectUser"
+          [style]="{'width':'100%'}"
+          [required]="true"
+          [autofocus]="true"
+          appendTo="body"
+        ></p-dropdown>
+        <small 
+          class="p-error"
+          *ngIf="submitted && consultancyService.consultancy.id_cliente == 0"
+          >Selecione o cliente da assessoria.</small>
+      </div>
+      <!-- <div class="field">
+        <p-button
+          label="Adicionar viajantes"
+          icon="pi pi-plus"
+          iconPos="right"
+          [rounded]="true"
+          (onClick)="addTravelers()"
+        >
+        </p-button>
+      </div>
+      <div class="field" *ngFor="let tr of consultancyService.travelers">
+        <label for="traveler_{{tr.id}}">Nome do viajante</label>
+        <div class="w-full flex align-items-center gap-2">
+            <input
+              pInputText
+              [(ngModel)]="tr.nome"
+              id="traveler_{{tr.id}}"
+              type="text"
+              class="text-base text-color surface-overlay border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+            />
+          <p-button
+            label="Remover&nbsp;viajante"
+            icon="pi pi-minus"
+            iconPos="right"
+            [rounded]="true"
+            (onClick)="removeTraveler(tr.id)"
+          >
+          </p-button>
+        </div>
+      </div> -->
+      <div class="w-full flex justify-content-end">
+        <p-button
+          label="Próximo"
+          icon="pi pi-chevron-right"
+          iconPos="right"
+          [text]="true"
+          [rounded]="true"
+          (onClick)="check()"
+        >
+        </p-button>
+      </div>
+    </div>
+  </div>
+</div>

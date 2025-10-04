@@ -1,0 +1,239 @@
+<div class="grid h-full-10 overflow-y-hidden">
+	<div class="col-12 h-full-10 w-min-30 overflow-y-hidden">
+		<div class="mx-2 py-2">
+			<h4>
+				<i class="bi bi-send"></i>
+				Painel de Assessorias
+			</h4>
+		</div>
+		<div class="flex h-full-3 overflow-x-auto overflow-y-hidden">
+			<div class="col-3 border-round">
+				<div class="text-center surface-border border-bottom-1 pb-2">
+					Pendentes
+					<p-badge class="mx-2" [value]="pending.length.toString()" />
+				</div>
+				<div 
+				cdkDropList 
+				#pendingCdk="cdkDropList"
+				[cdkDropListData]="pending"
+				[cdkDropListConnectedTo]="[waitingServiceCdk, inServiceCdk, finishedCdk]"
+				[cdkDropListDisabled]="true"
+				(cdkDropListDropped)="drop($event, 2)"
+				class="h-full p-2 pb-3 border-round overflow-y-auto"
+				>
+					<div *ngFor="let item of pending" 
+						class="card p-3 mb-2 cursor-pointer shadow-2"
+						role="button"
+						(click)="openModal(item.id)"
+						cdkDrag>
+						<div class="flex flex-column justify-content-between align-items-stretch gap-3">
+							<div class="flex justify-content-between text-sm text-900">
+								<span class="flex gap-1">
+									<span class="flex gap-1">
+										<i class="bi bi-send"></i>
+										{{ item.id }}
+									</span>
+									<span 
+										class="p-error ml-2"
+										[pTooltip]="item.status_assessoria?.nome"
+										tooltipPosition="top"
+										appendTo="body"
+									>
+										<i class="bi bi-exclamation-triangle"></i>
+									</span>
+								</span>
+								<span class="text-600">
+									{{ consultancyService.formatDate(item.data_contratacao) }}
+								</span>
+							</div>
+							<div class="flex">
+								<span class="mx-2 text-xl text-900">
+									{{ item.tipo_assessoria?.nome }}
+								</span>
+							</div>
+							<div class="flex align-items-center justify-content-between">
+								<span class="flex align-content-end gap-2">
+									<i class="pi pi-user mx-1"></i>
+									{{ item.cliente?.nome_completo }}
+								</span>
+								<span>
+									<p-avatar 
+										[image]="item.funcionario?.foto" 
+										shape="circle" 
+										class="mt-1"
+										[pTooltip]="item.funcionario?.nome_completo"
+										tooltipPosition="top"
+										appendTo="body"
+									></p-avatar>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-3 border-round">
+				<div class="text-center surface-border border-bottom-1 pb-2">
+					Aguardando Atendimento
+					<p-badge class="mx-2" [value]="waiting.length.toString()" />
+				</div>
+				<div 
+				cdkDropList 
+				#waitingServiceCdk="cdkDropList"
+				[cdkDropListData]="waiting"
+				[cdkDropListConnectedTo]="[pendingCdk, inServiceCdk, finishedCdk]"
+				(cdkDropListDropped)="drop($event, 3)"
+				class="h-full p-2 pb-3 border-round overflow-y-auto"
+				>
+					<div *ngFor="let item of waiting" 
+					class="card p-3 mb-2 cursor-pointer shadow-2"
+					role="button"
+					(click)="openModal(item.id)"
+					cdkDrag>
+						<div class="flex flex-column justify-content-between align-items-stretch gap-3">
+							<div class="flex justify-content-between text-sm text-900">
+								<span class="flex gap-1">
+									<i class="bi bi-send"></i>
+									{{ item.id }}
+								</span>
+								<span class="text-600">
+									{{ consultancyService.formatDate(item.data_contratacao) }}
+								</span>
+							</div>
+							<div class="flex">
+								<span class="mx-2 text-xl text-900">
+									{{ item.tipo_assessoria?.nome }}
+								</span>
+							</div>
+							<div class="flex align-items-center justify-content-between">
+								<span class="flex align-content-end gap-2">
+									<i class="pi pi-user mx-1"></i>
+									{{ item.cliente?.nome_completo }}
+								</span>
+								<span>
+									<p-avatar 
+										[image]="item.funcionario?.foto" 
+										shape="circle" 
+										class="mt-1"
+										[pTooltip]="item.funcionario?.nome_completo"
+										tooltipPosition="top"
+										appendTo="body"
+									></p-avatar>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-3 border-round">
+				<div class="text-center surface-border border-bottom-1 pb-2">
+					Em Atendimento
+					<p-badge class="mx-2" [value]="inService.length.toString()" />
+				</div>
+				<div 
+				cdkDropList 
+				#inServiceCdk="cdkDropList"
+				[cdkDropListData]="inService"
+				[cdkDropListConnectedTo]="[pendingCdk, waitingServiceCdk, finishedCdk]"
+				(cdkDropListDropped)="drop($event, 4)"
+				class="h-full p-2 pb-3 border-round overflow-y-auto"
+					>
+					<div *ngFor="let item of inService" 
+						class="card p-3 mb-2 cursor-pointer shadow-2"
+						role="button"
+						(click)="openModal(item.id)"
+						cdkDrag>
+						<div class="flex flex-column justify-content-between align-items-stretch gap-3">
+							<div class="flex justify-content-between text-sm text-900">
+								<span class="flex gap-1">
+									<i class="bi bi-send"></i>
+									{{ item.id }}
+								</span>
+								<span class="text-600">
+									{{ consultancyService.formatDate(item.data_contratacao) }}
+								</span>
+							</div>
+							<div class="flex">
+								<span class="mx-2 text-xl text-900">
+									{{ item.tipo_assessoria?.nome }}
+								</span>
+							</div>
+							<div class="flex align-items-center justify-content-between">
+								<span class="flex align-content-end gap-2">
+									<i class="pi pi-user mx-1"></i>
+									{{ item.cliente?.nome_completo }}
+								</span>
+								<span>
+									<p-avatar 
+										[image]="item.funcionario?.foto" 
+										shape="circle" 
+										class="mt-1"
+										[pTooltip]="item.funcionario?.nome_completo"
+										tooltipPosition="top"
+										appendTo="body"
+									></p-avatar>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-3 border-round">
+				<div class="text-center surface-border border-bottom-1 pb-2">
+					Finalizadas
+					<p-badge class="mx-2" [value]="finished.length.toString()" />
+				</div>
+				<div 
+				cdkDropList 
+				#finishedCdk="cdkDropList"
+				[cdkDropListData]="finished"
+				[cdkDropListConnectedTo]="[pendingCdk, waitingServiceCdk, inServiceCdk]"
+				(cdkDropListDropped)="drop($event, 5)"
+				class="h-full p-2 pb-3 border-round overflow-y-auto"
+				>
+					<div *ngFor="let item of finished" 
+						class="card p-3 mb-2 cursor-pointer shadow-2"
+						role="button"
+						(click)="openModal(item.id)"
+						cdkDrag>
+						<div class="flex flex-column justify-content-between align-items-stretch gap-3">
+							<div class="flex justify-content-between text-sm text-900">
+								<span class="flex gap-1">
+									<i class="bi bi-send"></i>
+									{{ item.id }}
+								</span>
+								<span class="text-600">
+									{{ consultancyService.formatDate(item.data_contratacao) }}
+								</span>
+							</div>
+							<div class="flex">
+								<span class="mx-2 text-xl text-900">
+									{{ item.tipo_assessoria?.nome }}
+								</span>
+							</div>
+							<div class="flex align-items-center justify-content-between">
+								<span class="flex align-content-end gap-2">
+									<i class="pi pi-user mx-1"></i>
+									{{ item.cliente?.nome_completo }}
+								</span>
+								<span>
+									<p-avatar 
+										[image]="item.funcionario?.foto" 
+										shape="circle" 
+										class="mt-1"
+										[pTooltip]="item.funcionario?.nome_completo"
+										tooltipPosition="top"
+										appendTo="body"
+									></p-avatar>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<app-consultancy-modal 
+		[consultancy]="consultancyService.consultancy_view!"
+		[(visible)]="showModal"
+		></app-consultancy-modal>
+	</div>
+</div>

@@ -1,0 +1,84 @@
+<div class="layout-wrapper" [ngClass]="containerClass">
+  <app-topbar></app-topbar>
+  <div class="layout-sidebar">
+    <app-sidebar></app-sidebar>
+  </div>
+  <div class="layout-main-container">
+    <div class="layout-main">
+      <router-outlet></router-outlet>
+    </div>
+    <app-footer></app-footer>
+  </div>
+  <app-config></app-config>
+  <div class="layout-mask"></div>
+</div>
+<p-dialog
+  styleClass="p-fluid"
+  [style]="{ width: '50rem' }"
+  [(visible)]="showModalPassword"
+  header="Alterar Senha Padrão do Sistema:"
+  [modal]="true"
+  [draggable]="true"
+  [closable]="false"
+  [dismissableMask]="false"
+  [closeOnEscape]="false"
+  >
+  <ng-template pTemplate="content">
+    <div class="formgrid grid p-fluid">
+      <div class="field col-12">
+        <label for="new_password">Nova Senha</label>
+        <p-password 
+          inputId="new_password"
+          [(ngModel)]="new_password"
+          [toggleMask]="true"
+          [mediumRegex]="regex_medium"
+          [strongRegex]="regex_strong"
+          appendTo="body"
+          autocomplete="true"
+          [ngClass]="{'ng-invalid ng-dirty' : submitted && !new_password }"
+          >
+            <ng-template pTemplate="header">
+                <h6>Preencha sua nova senha</h6>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <p-divider />
+                <p class="mt-2">Requisitos</p>
+                <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+                    <li>Ao menos uma letra minúscula.</li>
+                    <li>Ao menos uma letra maiúscula.</li>
+                    <li>Ao menos um número.</li>
+                    <li>Ao menos um caractere especial.</li>
+                    <li>Mínimo 8 caracteres.</li>
+                </ul>
+            </ng-template>
+        </p-password>
+      </div>
+      <div class="field col-12">
+        <label for="old_password">Confirmar nova senha</label>
+        <p-password 
+          [(ngModel)]="confirm_password"
+          [toggleMask]="true"
+          [feedback]="false"
+          [ngClass]="{'ng-invalid ng-dirty' : new_password && (new_password != confirm_password) }"
+          >
+        </p-password>
+        <small
+          class="p-error"
+          *ngIf="new_password && (new_password != confirm_password)"
+        >
+          As senhas não coincidem.
+        </small>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Salvar"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="onSavePassword()"
+    ></button>
+  </ng-template>
+</p-dialog>

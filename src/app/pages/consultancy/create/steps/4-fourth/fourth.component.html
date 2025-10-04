@@ -1,0 +1,139 @@
+<div class="grid" pFocusTrap>
+	<div class="col-12">
+		<div class="mx-2 py-2">
+			<h5>Informações Básicas</h5>
+		</div>
+		<div class="card">
+			<div class="formgrid grid p-fluid">
+				<div class="field col-12 lg:col-6">
+					<div class="text-900 mb-3"><b>Usuário a ser vinculado a assessoria:</b></div>
+					<span class="text-900 mx-3">{{ userName() }}</span>
+				</div>
+				<!-- <div class="field col-12 lg:col-6">
+					<div class="text-900 mb-3"><b>Viajantes adicionais:</b></div>
+					<div class="text-900 mx-3 mb-3" 
+						*ngFor="let tr of consultancyService.travelers">{{ tr.nome }}</div>
+				</div> -->
+			</div>
+		</div>
+	</div>
+	<div class="col-12">
+		<div class="mx-2 py-2">
+			<h5>Assessoria</h5>
+		</div>
+		<div class="card">
+			<div class="formgrid grid p-fluid">
+				<div class="field col-12 lg:col-6">
+					<div class="text-900 mb-3"><b>Tipo de assessoria:</b></div>
+					<span class="text-900 mx-3">{{ consultancyType() }}</span>
+				</div>
+				<div
+					class="field col-12 lg:col-6"
+					*ngIf="consultancyService.checkConsultancyTypeStrict()"
+				>
+					<div class="text-900 mb-3"><b>Tipo do visto:</b></div>
+					<span class="text-900 mx-3">{{ visaType() }}</span>
+				</div>
+				<div
+					class="field col-12 lg:col-6"
+					*ngIf="consultancyService.checkConsultancyType()"
+				>
+					<div class="text-900 mb-3"><b>País de destino:</b></div>
+					<span class="text-900 mx-3 flex align-items-center">
+						<img
+							[src]="country?.codigo"
+							class="flag mr-2"
+							style="width: 20px"
+						/>
+						<span>{{ country?.nome }}</span>
+					</span>
+				</div>
+				<div
+					class="field col-12 lg:col-6"
+				>
+					<div class="text-900 mb-3"><b>Formulário de Preenchimento:</b></div>
+					<span class="text-900 mx-3">{{ formName() }}</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-12">
+		<div class="mx-2 py-2">
+			<h5>Pagamento</h5>
+		</div>
+		<div class="card">
+			<div class="formgrid grid p-fluid">
+				<div class="field col-12 lg:col">
+					<div class="text-900 mb-3"><b>Valor da assessoria:</b></div>
+					<span class="text-900 mx-3">{{ consultancyService.consultancy.valor_assessoria.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</span>
+				</div>
+				<div class="field col-12 lg:col">
+					<div class="text-900 mb-3"><b>Método de Pagamento:</b></div>
+					<span class="text-900 mx-3">{{ paymentType() }}</span>
+				</div>
+				<div class="field col-12 lg:col">
+					<div class="text-900 mb-3"><b>Status do Pagamento:</b></div>
+					<span class="text-900 mx-3">{{ paymentStatus() }}</span>
+				</div>
+				<div
+					class="field col-12 lg:col"
+					*ngIf="consultancyService.checkPaymentStatus([1])"
+				>
+					<div class="text-900 mb-3"><b>Comprovante de Pagamento:</b></div>
+					<span class="text-900 mx-3">{{ consultancyService.file?.name }}</span>
+				</div>
+				<div 
+					class="field col-12" 
+					*ngIf="consultancyService.checkPaymentStatus([2])">
+					<div class="grid field" *ngIf="consultancyService.checkPaymentType([1])">
+						<div class="field col-12 lg:col">
+							<p>Método de Pagamento Pix</p>
+						</div>
+					</div>
+					<div class="grid field" *ngIf="consultancyService.checkPaymentType([2,3])">
+						<div class="field col-12">
+							<div class="text-900 mb-3"><b>Nome no Cartão:</b></div>
+							<span class="text-900 mx-3">{{ consultancyService.card.nome }}</span>
+						</div>
+						<div class="field col-12 lg:col">
+							<div class="text-900 mb-3"><b>Número:</b></div>
+							<span class="text-900 mx-3">{{ consultancyService.card.numero }}</span>
+						</div>
+						<div class="field col-12 lg:col">
+							<div class="text-900 mb-3"><b>Vencimento:</b></div>
+							<span class="text-900 mx-3">{{ formatDate(consultancyService.card.data) }}</span>
+						</div>
+						<div class="field col-12 lg:col">
+							<div class="text-900 mb-3"><b>Código de Segurança:</b></div>
+							<span class="text-900 mx-3">{{ consultancyService.card.cvv }}</span>
+						</div>
+						<div class="field col-12" *ngIf="consultancyService.checkPaymentType([2])">
+							<div class="text-900 mb-3"><b>Parcelamento:</b></div>
+							<span class="text-900 mx-3">{{ noun() }}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="w-full flex flex-row-reverse justify-content-between">
+		<p-button
+			label="Criar Assessoria"
+			icon="bi bi-send"
+			iconPos="right"
+			[text]="true"
+			[rounded]="true"
+			(onClick)="consultancyService.createConsultancy()"
+		>
+		</p-button>
+		<p-button
+			label="Anterior"
+			icon="pi pi-chevron-left"
+			iconPos="left"
+			[text]="true"
+			[rounded]="true"
+			(onClick)="consultancyService.thirdStep()"
+		>
+		</p-button>
+	</div>
+</div>

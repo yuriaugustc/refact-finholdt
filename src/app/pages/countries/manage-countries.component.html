@@ -1,0 +1,136 @@
+<div class="grid">
+  <p-confirmPopup></p-confirmPopup>
+  <div class="col-12">
+    <div class="mx-2 py-2">
+      <h4>
+        <i class="bi bi-globe-americas"></i>
+        Gerenciar Países
+      </h4>
+    </div>
+    <div class="card">
+      <p-table
+        #table
+        dataKey="id"
+        [value]="countryService.countries"
+        [loading]="countryService.loading"
+        [lazy]="true"
+        (onLazyLoad)="countryService.loadCountries($event)"
+        [paginator]="true"
+        [rows]="10"
+        [totalRecords]="countryService.totalRecords"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{first} a {last} de {totalRecords} país(es)"
+        stateStorage="session"
+        stateKey="countries"
+        [(selection)]="selectedCountries"
+        [rowHover]="true"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [styleClass]="'p-datatable-sm'"
+      >
+        <ng-template pTemplate="caption">
+          <div class="flex flex-wrap gap-3 justify-content-start">
+            <p-button
+              pTooltip="Reativar país(es) selecionado(s)"
+              tooltipPosition="top"
+              appendTo="body"
+              icon="pi pi-plus"
+              class="btn"
+              [rounded]="true"
+              [outlined]="true"
+              severity="success"
+              [style]="{ 'border-radius': '10px' }"
+              (click)="activateCountries($event)"
+              [disabled]="!selectedCountries || !selectedCountries.length"
+            >
+            </p-button>
+            <p-button
+              pTooltip="Inativar país(es) selecionado(s)"
+              tooltipPosition="top"
+              appendTo="body"
+              icon="pi pi-times"
+              class="btn"
+              (click)="deactivateCountries($event)"
+              [rounded]="true"
+              [outlined]="true"
+              severity="danger"
+              [style]="{ 'border-radius': '10px' }"
+              [disabled]="!selectedCountries || !selectedCountries.length"
+            >
+            </p-button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 4rem">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th pSortableColumn="nome">
+              Nome <p-sortIcon field="nome"></p-sortIcon>
+            </th>
+            <th style="width: 10rem" pSortableColumn="codigo">
+              Código <p-sortIcon field="codigo"></p-sortIcon>
+            </th>
+            <th style="width: 10rem" pSortableColumn="ativo">
+              Ativo <p-sortIcon field="ativo"></p-sortIcon>
+            </th>
+          </tr>
+          <tr>
+            <th></th>
+            <th>
+              <p-columnFilter
+                type="text"
+                field="nome"
+                matchMode="contains"
+                [showMenu]="false"
+                pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+                tooltipPosition="top"
+                appendTo="body"
+              >
+              </p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter
+                type="text"
+                field="codigo"
+                matchMode="contains"
+                [showMenu]="false"
+                pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+                tooltipPosition="top"
+                appendTo="body"
+              >
+              </p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter
+                type="boolean"
+                field="ativo"
+                matchMode="equals"
+                [showMenu]="false"
+              >
+              </p-columnFilter>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-country>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="country"></p-tableCheckbox>
+            </td>
+            <td>{{ country.nome }}</td>
+            <td>{{ country.codigo }}</td>
+            <td>
+              <i
+                class="pi"
+                [ngClass]="
+                  country.ativo
+                    ? 'text-green-500 pi-check-circle text-success'
+                    : 'text-red-500 pi-times-circle text-danger'
+                "
+              ></i>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

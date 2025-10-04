@@ -1,0 +1,392 @@
+<div class="grid">
+	<p-confirmPopup></p-confirmPopup>
+	<div class="col-12">
+		<div class="mx-2 py-2">
+			<h4>
+				<i class="bi bi-ui-checks"></i>
+				Gerenciamento de Perguntas
+			</h4>
+		</div>
+		<div class="card">
+			<p-table
+				#table
+				dataKey="id"
+				[value]="formService.questions"
+				[loading]="loading"
+				[lazy]="true"
+				(onLazyLoad)="formService.loadQuestions($event)"
+				[paginator]="true"
+				[rows]="10"
+				[totalRecords]="formService.totalRecords"
+				[showCurrentPageReport]="true"
+				currentPageReportTemplate="{first} a {last} de {totalRecords} pergunta(s)"
+				stateStorage="session"
+				stateKey="crud-questions"
+				[(selection)]="selectedQuestions"
+				[rowHover]="true"
+				[tableStyle]="{ 'min-width': '50rem' }"
+				[styleClass]="'p-datatable-sm'"
+			>
+				<ng-template pTemplate="caption">
+					<div class="flex flex-wrap gap-3 justify-content-start">
+						<p-button
+							pTooltip="Criar nova pergunta"
+							tooltipPosition="top"
+							appendTo="body"
+							icon="pi pi-plus"
+							class="btn"
+							[rounded]="true"
+							[outlined]="true"
+							severity="success"
+							[style]="{ 'border-radius': '10px' }"
+							(click)="openModal({ id: 0 }, 'create')"
+						>
+						</p-button>
+						<p-button
+							pTooltip="Inativar pergunta(s) selecionada(s)"
+							tooltipPosition="top"
+							appendTo="body"
+							icon="pi pi-times"
+							class="btn"
+							(click)="deleteSelectedQuestions($event)"
+							[rounded]="true"
+							[outlined]="true"
+							severity="danger"
+							[style]="{ 'border-radius': '10px' }"
+							[disabled]="!selectedQuestions || !selectedQuestions.length"
+						>
+						</p-button>
+					</div>
+				</ng-template>
+				<ng-template pTemplate="header">
+					<tr>
+						<th style="width: 4rem">
+							<p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+						</th>
+						<th pSortableColumn="descricao">
+							Descrição <p-sortIcon field="descricao"></p-sortIcon>
+						</th>
+						<th pSortableColumn="tipo">
+							Tipo <p-sortIcon field="tipo"></p-sortIcon>
+						</th>
+						<th pSortableColumn="obrigatoria">
+							Obrigatória <p-sortIcon field="obrigatoria"></p-sortIcon>
+						</th>
+						<th pSortableColumn="ativo">
+							Ativo <p-sortIcon field="ativo"></p-sortIcon>
+						</th>
+						<th>Ações</th>
+					</tr>
+					<tr>
+						<th></th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="descricao"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!"
+								tooltipPosition="top"
+								appendTo="body"
+							>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="tipo"
+								matchMode="equals"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!"
+								tooltipPosition="top"
+								appendTo="body"
+							>
+								<ng-template pTemplate="filter" let-value let-filter="filterCallback">
+									<p-multiSelect
+										inputId="filter_consultancy_type"
+										[options]="formService.questionTypes"
+										[ngModel]="value"
+										optionLabel="descricao"
+										optionValue="id"
+										(onChange)="filter($event.value)"
+										[style]="{ width: '100%' }"
+										appendTo="body"
+									></p-multiSelect>
+								</ng-template>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="boolean"
+								field="obrigatoria"
+								matchMode="contains"
+								[showMenu]="false"
+							>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="boolean"
+								field="ativo"
+								matchMode="equals"
+								[showMenu]="false"
+							>
+							</p-columnFilter>
+						</th>
+						<th></th>
+					</tr>
+				</ng-template>
+				<ng-template pTemplate="body" let-question>
+					<tr>
+						<td>
+							<p-tableCheckbox [value]="question"></p-tableCheckbox>
+						</td>
+						<td>{{ question.descricao }}</td>
+						<td>{{ question.tipo }}</td>
+						<td>
+							<i
+								class="pi"
+								[ngClass]="
+									question.obrigatoria == 1
+										? 'text-green-500 pi-check-circle text-success'
+										: 'text-red-500 pi-times-circle text-danger'
+								"
+							></i>
+						</td>
+						<td>
+							<i
+								class="pi"
+								[ngClass]="
+									question.ativo == 1
+										? 'text-green-500 pi-check-circle text-success'
+										: 'text-red-500 pi-times-circle text-danger'
+								"
+							></i>
+						</td>
+						<td>
+							<div class="flex align-items-center justify-content-center gap-2">
+								<button
+									pButton
+									pRipple
+									type="button"
+									icon="pi pi-pencil"
+									(click)="openModal(question, 'edit')"
+									class="p-button-rounded p-button-text mr-2"
+								></button>
+							</div>
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		</div>
+		<p-dialog
+			styleClass="p-fluid"
+			[style]="{ width: '50rem' }"
+			[(visible)]="showModal"
+			[header]="formService.selectedQuestion.id ? 'Editar pergunta' : 'Criar pergunta'"
+			[modal]="true"
+			[draggable]="true"
+			[closable]="false"
+			[dismissableMask]="true"
+		>
+			<ng-template pTemplate="content">
+				<div class="field mb-2">
+					<label for="nome">Descrição</label>
+					<input
+						type="text"
+						pInputText
+						id="nome"
+						[(ngModel)]="formService.selectedQuestion.descricao"
+						required
+						autofocus
+					/>
+					<small class="p-error" *ngIf="submitted && !formService.selectedQuestion.descricao"
+						>Descrição da pergunta é obrigatória.</small
+					>
+				</div>
+	
+				<div class="field mb-2" *ngIf="!formService.selectedQuestion.id">
+					<label for="id_tipo">Tipo da pergunta</label>
+					<p-dropdown
+						emptyFilterMessage="Nenhum resultado encontrado."
+						emptyMessage="Nenhum resultado encontrado"
+						[(ngModel)]="formService.selectedQuestion.id_tipo"
+						inputId="id_tipo"
+						[options]="formService.questionTypes"
+						appendTo="body"
+						optionLabel="descricao"
+						optionValue="id"
+						[required]="true"
+					>
+					</p-dropdown>
+					<small class="p-error" *ngIf="submitted && !formService.selectedQuestion.id_tipo"
+						>Tipo da pergunta é obrigatória.</small
+					>
+				</div>
+				<div class="field my-2" *ngIf="answersVisible()">
+					<label>Possíveis respostas:</label>
+					<p-table [value]="formService.selectedQuestion.respostas ?? []" styleClass="p-datatable-sm">
+						<ng-template pTemplate="header">
+							<tr>
+								<th [style]="{ width: '5%' }">
+									<p-button
+										pTooltip="Criar resposta"
+										tooltipPosition="top"
+										appendTo="body"
+										icon="pi pi-plus"
+										class="btn"
+										[rounded]="true"
+										[outlined]="true"
+										severity="success"
+										[style]="{ 'border-radius': '10px' }"
+										(click)="this.modalAnswer = true"
+									>
+									</p-button>
+								</th>
+								<th>Nome</th>
+								<th [style]="{ width: '10%' }">Ativo</th>
+								<th [style]="{ width: '20%' }">Ações</th>
+							</tr>
+						</ng-template>
+						<ng-template
+							pTemplate="body"
+							let-answer
+							let-editing="editing"
+							let-ri="rowIndex"
+						>
+							<tr [pEditableRow]="answer">
+								<td></td>
+								<td>{{ answer.descricao }}</td>
+								<td>
+									<i
+										class="pi"
+										[ngClass]="
+											answer.ativo == 1
+												? 'text-green-500 pi-check-circle text-success'
+												: 'text-red-500 pi-times-circle text-danger'
+										"
+									></i>
+								</td>
+								<td>
+									<div
+										class="flex align-items-center justify-content-center gap-2"
+									>
+										<button
+											*ngIf="!editing"
+											pButton
+											pRipple
+											type="button"
+											icon="pi pi-pencil"
+											(click)="editAnswer(answer)"
+											class="p-button-rounded p-button-text mr-2"
+										></button>
+										<button
+											*ngIf="!editing"
+											pButton
+											pRipple
+											type="button"
+											icon="pi pi-trash"
+											(click)="deleteAnswer($event, answer)"
+											class="p-button-rounded p-button-text p-button-danger"
+										></button>
+									</div>
+								</td>
+							</tr>
+						</ng-template>
+					</p-table>
+				</div>
+	
+				<div class="field mb-2">
+					<label for="obrigatoria" class="mx-2">Pergunta Obrigatória?</label>
+					<p-checkbox
+						[value]="true"
+						inputId="obrigatoria"
+						[binary]="true"
+						[(ngModel)]="formService.selectedQuestion.obrigatoria"
+					></p-checkbox>
+				</div>
+				<div class="field mb-2" *ngIf="formService.selectedQuestion.id">
+					<label for="ativo" class="mx-2">Ativo</label>
+					<p-checkbox
+						[value]="true"
+						inputId="ativo"
+						[binary]="true"
+						[(ngModel)]="formService.selectedQuestion.ativo"
+					></p-checkbox>
+				</div>
+			</ng-template>
+			<ng-template pTemplate="footer">
+				<button
+					pButton
+					pRipple
+					label="Cancelar"
+					icon="pi pi-times"
+					class="p-button-text"
+					(click)="closeModal()"
+				></button>
+				<button
+					pButton
+					pRipple
+					label="Salvar"
+					icon="pi pi-check"
+					class="p-button-text"
+					(click)="onSave()"
+				></button>
+			</ng-template>
+		</p-dialog>
+		<p-dialog
+			styleClass="p-fluid"
+			[style]="{ width: '50rem' }"
+			[(visible)]="modalAnswer"
+			[header]="formService.selectedAnswer ? 'Criar resposta' : 'Editar resposta'"
+			[modal]="true"
+			[draggable]="true"
+			[closable]="false"
+			[dismissableMask]="true"
+		>
+			<ng-template pTemplate="content">
+				<div class="field mb-2">
+					<label for="nome">Descrição</label>
+					<input
+						type="text"
+						pInputText
+						id="nome"
+						[(ngModel)]="formService.selectedAnswer.descricao"
+						required
+						autofocus
+					/>
+					<small class="p-error" *ngIf="!formService.selectedAnswer.descricao"
+						>Descrição da resposta é obrigatória.</small
+					>
+				</div>
+				<div class="field mb-2" *ngIf="formService.selectedAnswer.id">
+					<label for="ativo" class="mx-2">Ativo</label>
+					<p-checkbox
+						[value]="true"
+						inputId="ativo"
+						[binary]="true"
+						[(ngModel)]="formService.selectedAnswer.ativo"
+					></p-checkbox>
+				</div>
+			</ng-template>
+			<ng-template pTemplate="footer">
+				<button
+					pButton
+					pRipple
+					label="Cancelar"
+					icon="pi pi-times"
+					class="p-button-text"
+					(click)="closeAnswerModal()"
+				></button>
+				<button
+					pButton
+					pRipple
+					label="Salvar"
+					icon="pi pi-check"
+					class="p-button-text"
+					(click)="updateAnswer()"
+				></button>
+			</ng-template>
+		</p-dialog>
+	</div>
+</div>

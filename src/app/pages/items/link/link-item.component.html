@@ -1,0 +1,145 @@
+<div class="grid">
+  <p-confirmPopup></p-confirmPopup>
+  <div class="col-12">
+    <div class="mx-2 py-2">
+      <h4>
+        <i class="bi bi-diagram-3"></i>
+        Item x Usuário
+      </h4>
+    </div>
+    <div class="card">
+      <p-table
+        #table
+        dataKey="id"
+        [value]="itemService.userItems"
+        [rows]="10"
+        stateStorage="session"
+        stateKey="link-actions"
+        [(selection)]="selectedItems"
+        [rowHover]="true"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [styleClass]="'p-datatable-sm'"
+      >
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between">
+            <div>
+              Usuário: 
+              <i
+                class="bi bi-info-circle mr-2"
+                role="button"
+                pTooltip="Selecione um usuário para carregar e gerenciar seus itens"
+                tooltipPosition="top"
+              ></i>
+              <p-dropdown
+                [options]="userService.users"
+                [filter]="true"
+                name="drop"
+                #drop
+                optionLabel="nome_completo"
+                optionValue="id"
+                [(ngModel)]="selectedUser"
+                (onChange)="loadItemsByUserId()"
+                [style]="{ 'min-width': '30em' }"
+              >
+              </p-dropdown>
+            </div>
+            <div>
+              <p-button
+                pTooltip="Adicionar acesso a um ou mais itens"
+                tooltipPosition="top"
+                appendTo="body"
+                icon="pi pi-plus"
+                class="mx-1"
+                [rounded]="true"
+                [outlined]="true"
+                severity="success"
+                [style]="{ 'border-radius': '10px' }"
+                (click)="openModal()"
+                [disabled]="!selectedUser"
+              >
+              </p-button>
+              <p-button
+                pTooltip="Remover acesso do(s) item(ns) selecionado(s)"
+                tooltipPosition="top"
+                appendTo="body"
+                icon="pi pi-trash"
+                (click)="removeSelectedItems($event)"
+                class="mx-1"
+                [rounded]="true"
+                [outlined]="true"
+                severity="danger"
+                [style]="{ 'border-radius': '10px' }"
+                [disabled]="!(selectedUser && selectedItems.length > 0)"
+              >
+              </p-button>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 4rem">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th>Nome</th>
+            <th>Icone</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="item"></p-tableCheckbox>
+            </td>
+            <td>{{ item.nome }}</td>
+            <td>{{ item.icone }} | <i class="{{ item.icone }}"></i></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <p-dialog
+      styleClass="p-fluid"
+      [style]="{ width: '50rem' }"
+      [(visible)]="showModal"
+      [header]="'Adicionar um item para o usuário:'"
+      [modal]="true"
+      [draggable]="true"
+      [closable]="false"
+      [dismissableMask]="true"
+    >
+      <ng-template pTemplate="content">
+        <div class="field">
+          <label for="ativo">Selecione um ou mais itens:</label>
+          <p-multiSelect
+            inputId="ativo"
+            [options]="filteredItems"
+            appendTo="body"
+            [filter]="true"
+            optionLabel="nome"
+            optionValue="id"
+            [(ngModel)]="selectedItems"
+            display="chip" 
+            [showClear]="true"
+          >
+          </p-multiSelect>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Cancelar"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="closeModal()"
+        ></button>
+        <button
+          pButton
+          pRipple
+          label="Salvar"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="onSave()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+<div class="layout-topbar">
+  <a class="layout-topbar-logo" routerLink="/home">
+    <img src="assets/imgs/logo.png" alt="logo" />
+    <span>Arca Vistos</span>
+  </a>
+
+  <button
+    #menubutton
+    class="p-link layout-menu-button layout-topbar-button"
+    (click)="layoutService.onMenuToggle()"
+  >
+    <i class="pi pi-bars"></i>
+  </button>
+
+  <button
+    #topbarmenubutton
+    class="p-link layout-topbar-menu-button layout-topbar-button"
+    (click)="menu.toggle($event)"
+  >
+    <i class="pi pi-ellipsis-v"></i>
+  </button>
+
+  <div
+    #topbarmenu
+    class="layout-topbar-menu"
+    [ngClass]="{
+      'layout-topbar-menu-mobile-active':
+        layoutService.state.profileSidebarVisible
+    }"
+  >
+    <button class="p-link layout-topbar-button" (click)="menu.toggle($event)">
+      <i *ngIf="foto == ''" class="pi pi-user"></i>
+      <p-avatar 
+        *ngIf="foto != ''"
+        [image]="foto" 
+        size="large" 
+        shape="circle" />
+      <span>Perfil</span>
+    </button>
+  </div>
+</div>
+<!-- precisa ficar fora da div para nao interferir no scss -->
+<p-menu #menu [model]="options" [popup]="true"></p-menu>

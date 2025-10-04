@@ -1,0 +1,29 @@
+
+.container-img {
+    clip-path: polygon(0 0, calc(100% - 10vw) 0, 100% 100%, 0% 100%);
+}
+
+.container-card {
+    clip-path: polygon(calc(100% - 90vw) 0, 100% 0%, 100% 100%, 0% 100%);
+}
+
+@media (max-width: 991px) {
+    .grid {
+        background-image: url('../../../assets/imgs/carousel/imagem1.png');
+        background-size: cover;
+    }
+
+    .container-img {
+        display: none !important;
+    }
+
+    .container-card {
+        width: 100%;
+        margin: auto;
+    }
+
+    .container-card .card {
+        border-radius: 10px;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+}

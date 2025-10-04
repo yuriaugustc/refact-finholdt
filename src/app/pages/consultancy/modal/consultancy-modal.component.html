@@ -1,0 +1,859 @@
+<!-- Modal de Visualização -->
+<p-dialog
+  [header]="'Assessoria ' + consultancy?.id"
+  [modal]="true"
+  [dismissableMask]="true"
+  [(visible)]="visible"
+  (visibleChange)="onVisibleChange($event)"
+  [style]="{ width: '50rem' }"
+  *ngIf="!edit && !pendencies"
+>
+  <ng-template pTemplate="header">
+    <div
+      class="inline-flex align-items-center justify-content-center gap-2"
+    >
+      <span class="font-bold white-space-nowrap">
+        Detalhes da assessoria
+        <i class="bi bi-send ml-1"></i>
+        {{ consultancy?.id }}
+      </span>
+    </div>
+  </ng-template>
+  <p-tabView>
+    <p-tabPanel>
+      <ng-template pTemplate="header">
+        <i class="pi pi-list mx-2"></i>
+        <span>Geral</span>
+      </ng-template>
+      <div class="formgrid grid p-fluid">
+        <div class="field col-12 lg:col">
+          <div class="text-900 mb-3"><b>Cliente:</b></div>
+          <span class="text-900 mx-3">
+            {{ consultancy?.cliente?.nome_completo }} 
+          </span>
+        </div>
+        <div class="field col-12 lg:col-6">
+          <div class="text-900 mb-3"><b>Tipo de assessoria:</b></div>
+          <span class="text-900 mx-3"> 
+            {{ consultancy?.tipo_assessoria?.nome }}
+          </span>
+        </div>
+      </div>
+      <div class="formgrid grid p-fluid">
+        <div
+          class="field col-12 lg:col-6"
+          *ngIf="consultancy?.tipo_visto"
+        >
+          <div class="text-900 mb-3"><b>Tipo do visto:</b></div>
+          <span class="text-900 mx-3">
+            {{ consultancy?.tipo_visto?.nome }}
+          </span>
+        </div>
+        <div
+          class="field col-12 lg:col-6"
+          *ngIf="consultancy?.pais"
+        >
+          <div class="text-900 mb-3"><b>País de destino:</b></div>
+          <span class="text-900 mx-3 flex align-items-center">
+            <img
+              [src]="consultancy?.pais?.codigo"
+              class="flag mr-2"
+              style="width: 20px"
+            />
+            <span>{{ consultancy?.pais?.nome }}</span>
+          </span>
+        </div>
+        <div class="field col-12 lg:col-6">
+          <div class="text-900 mb-3">
+            <b>Formulário de Preenchimento:</b>
+          </div>
+          <span class="text-900 mx-3">{{ consultancy?.formulario?.nome }}</span>
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel>
+      <ng-template pTemplate="header">
+        <i class="pi pi-money-bill mx-2"></i>
+        <span>Pagamento</span>
+      </ng-template>
+      <div class="formgrid grid p-fluid">
+        <div class="field col-12 lg:col">
+          <div class="text-900 mb-3"><b>Valor da assessoria:</b></div>
+          <span class="text-900 mx-3">{{
+            consultancy?.valor_assessoria?.toLocaleString(
+              "pt-BR",
+              { style: "currency", currency: "BRL" }
+            )
+          }}</span>
+        </div>
+        <div class="field col-12 lg:col">
+          <div class="text-900 mb-3"><b>Método de Pagamento:</b></div>
+          <span class="text-900 mx-3">
+            {{ consultancy?.tipo_pagamento?.nome }} 
+          </span>
+        </div>
+      </div>
+      <div class="formgrid grid p-fluid">
+        <div class="field col-12 lg:col">
+          <div class="text-900 mb-3"><b>Status do Pagamento:</b></div>
+          <span class="text-900 mx-3">
+            {{ consultancy?.status_pagamento?.nome }}
+          </span>
+        </div>
+        <div
+          class="field col-12 lg:col"
+          *ngIf="consultancy?.comprovante"
+        >
+          <div class="text-900 mb-3">
+            <b>Comprovante de Pagamento:</b>
+          </div>
+          <span class="text-900 mx-3">
+            <a
+              href="{{ consultancy?.comprovante }}"
+              target="_blank"
+              >{{
+                consultancyService.attachmentName(consultancy?.comprovante)
+              }}</a>
+          </span>
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel *ngIf="consultancy?.formulario">
+      <ng-template pTemplate="header">
+        <i class="bi bi-card-checklist mx-2"></i>
+        <span>Formulário</span>
+      </ng-template>
+      <div class="formgrid grid p-fluid">
+        <div
+          class="field col-12 lg:col-6"
+          *ngFor="
+            let pergunta of consultancy?.formulario?.perguntas
+          "
+        >
+          <div class="text-900 mb-3">
+            <b>{{ pergunta.descricao }}</b>
+          </div>
+          <div class="flex align-content-center justify-content-start">
+            <span class="text-900 mx-3">
+              {{ pergunta.resposta.descricao }}
+            </span>
+            <span 
+              class="text-900 mr-3"
+              *ngIf="pergunta.id_tipo == 5"
+            >
+              <a href="{{ pergunta.resposta.caminho_anexo }}"
+                target="_blank"
+                pTooltip="Visualizar"
+                tooltipPosition="top"
+                appendTo="body"
+              >
+              <i class="pi pi-external-link"></i>
+              </a>
+            </span>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel>
+      <ng-template pTemplate="header">
+        <i class="pi pi-bookmark mx-2"></i>
+        <span>Histórico</span>
+      </ng-template>
+      <div class="formgrid grid p-fluid max-h-20rem overflow-y-scroll">
+        <p-timeline [value]="consultancy?.historico" class="w-full">
+          <ng-template pTemplate="content" let-log>
+            <small class="p-text-secondary">{{ log.data_alteracao }}</small>
+          </ng-template>
+          <ng-template pTemplate="opposite" let-log>
+            {{ log.descricao }}
+          </ng-template>
+        </p-timeline>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+</p-dialog>
+<!-- Modal de Edição -->
+<p-dialog
+  [header]="'Editar Assessoria ' + consultancy?.id"
+  [modal]="true"
+  [dismissableMask]="true"
+  [(visible)]="visible"
+  [style]="{ width: '50rem' }"
+  (visibleChange)="onVisibleChange($event)"
+  *ngIf="edit && !pendencies"
+>
+  <ng-template pTemplate="header">
+    <div
+      class="inline-flex align-items-center justify-content-center gap-2"
+    >
+      <span class="font-bold white-space-nowrap">
+        Editar Assessoria
+        <i class="bi bi-send ml-1"></i>
+        {{ consultancy?.id }}
+      </span>
+    </div>
+  </ng-template>
+  <p-tabView>
+    <p-tabPanel>
+      <ng-template pTemplate="header">
+        <i class="pi pi-list mx-2"></i>
+        <span>Geral</span>
+      </ng-template>
+      <div pFocusTrap class="formgrid grid p-fluid">
+        <div class="field col-12 lg:col-6">
+          <label for="selectCost">Cliente da assessoria</label>
+          <p-dropdown
+            [options]="userService.costumers"
+            [filter]="true"
+            [(ngModel)]="consultancyService.consultancy.id_cliente"
+            placeholder="Selecione um cliente..."
+            optionLabel="nome_completo"
+            optionValue="id"
+            inputId="selectCost"
+            [required]="true"
+            [style]="{ 'width' : '100%' }"
+            appendTo="body"
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.consultancy.id_cliente == 0 }"
+          ></p-dropdown>
+          <small 
+            class="p-error"
+            *ngIf="submitted && consultancyService.consultancy?.id_cliente == 0"
+            >Selecione o cliente da assessoria.</small>
+        </div>
+        <div class="field col-12 lg:col-6">
+          <label for="selectSell">Funcionário da assessoria</label>
+          <p-dropdown
+            [options]="userService.users"
+            [filter]="true"
+            [(ngModel)]="consultancyService.consultancy.id_funcionario"
+            placeholder="Selecione um funcionário..."
+            optionLabel="nome_completo"
+            optionValue="id"
+            inputId="selectSell"
+            [required]="true"
+            [style]="{'width':'100%'}"
+            appendTo="body"
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.consultancy.id_funcionario == 0 }"
+          ></p-dropdown>
+          <small 
+            class="p-error"
+            *ngIf="submitted && consultancyService.consultancy.id_funcionario == 0"
+            >Selecione o cliente da assessoria.</small>
+        </div>
+        <div class="field col-12 lg:col-6">
+          <label for="selectConsultancyType"
+            >Tipo de assessoria</label>
+          <p-dropdown
+            inputId="selectConsultancyType"
+            [options]="consultancyService.consultancyTypes"
+            [(ngModel)]="consultancyService.consultancy.id_tipo_assessoria"
+            [required]="true"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+            optionLabel="nome"
+            optionValue="id"
+            placeholder="Selecione..."
+            (onChange)="formService.loadFormsByConsultancyType($event.value)"
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.consultancy.id_tipo_assessoria == 0 }"
+          ></p-dropdown>
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              consultancyService.consultancy.id_tipo_assessoria == 0
+            "
+            >Selecione o tipo da assessoria.</small>
+        </div>
+        <div
+          class="field col-12 lg:col-6"
+          *ngIf="consultancyService.checkConsultancyTypeStrict()"
+        >
+          <label for="selectConsultancyType">Selecione o tipo do visto</label>
+          <p-dropdown
+            inputId="selectConsultancyType"
+            [options]="consultancyService.visaTypes"
+            [(ngModel)]="consultancyService.consultancy.id_tipo_visto"
+            [required]="true"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+            optionLabel="nome"
+            optionValue="id"
+            placeholder="Selecione..."
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.checkConsultancyTypeStrict() &&
+            consultancyService.consultancy.id_tipo_visto == 0 }"
+          ></p-dropdown>
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              consultancyService.checkConsultancyTypeStrict() &&
+              consultancyService.consultancy.id_tipo_visto == 0
+            ">Selecione o tipo do visto.</small>
+        </div>
+        <div
+          class="field col-12 lg:col-6"
+          *ngIf="consultancyService.checkConsultancyType()"
+        >
+          <label for="selectConsultancyType">Selecione o país de destino</label>
+          <p-dropdown
+            inputId="selectConsultancyType"
+            [options]="consultancyService.countries"
+            [(ngModel)]="consultancyService.consultancy.id_pais"
+            [filter]="true"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+            optionLabel="nome"
+            optionValue="id"
+            placeholder="Selecione..."
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.checkConsultancyType() &&
+            consultancyService.consultancy.id_pais == 0 }"
+          >
+            <ng-template let-country pTemplate="selectedItem">
+              <div class="flex align-items-center gap-2" *ngIf="country">
+                <img [src]="country.codigo" class="flag" style="width: 18px" />
+                <div>{{ country.nome }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-country pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <img [src]="country.codigo" class="flag" style="width: 18px" />
+                <div>{{ country.nome }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              consultancyService.checkConsultancyType() &&
+              consultancyService.consultancy.id_pais == 0
+            ">Selecione o pais de destino.</small>
+        </div>
+        <div class="field col-12 lg:col">
+          <label for="selectSts">Status da assessoria</label>
+          <p-dropdown
+            [options]="consultancyService.consultancyStatus"
+            [filter]="true"
+            [(ngModel)]="consultancyService.consultancy.id_status_assessoria"
+            placeholder="Selecione um status..."
+            optionLabel="nome"
+            optionValue="id"
+            inputId="selectSts"
+            [style]="{'width':'100%'}"
+            appendTo="body"
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.consultancy.id_status_assessoria == 0 }"
+          ></p-dropdown>
+          <small 
+            class="p-error"
+            *ngIf="submitted && consultancyService.consultancy.id_status_assessoria == 0"
+            >Selecione o status da assessoria.</small>
+        </div>
+        <div class="field col-12 lg:col-6">
+          <label for="selectForm">Formulário de preenchimento</label>
+          <p-dropdown
+            inputId="selectForm"
+            [options]="formService.forms"
+            [(ngModel)]="consultancyService.consultancy.id_formulario"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+            optionLabel="nome"
+            optionValue="id"
+            placeholder="Selecione..."
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.consultancy.id_formulario == 0 }"
+            (onChange)="getFormQuestions($event.value)"
+          ></p-dropdown>
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              consultancyService.consultancy.id_formulario == 0
+            ">Selecione o formulario de preenchimento.</small>
+        </div>
+        <div class="field col-12 lg:col-6">
+          <label for="selectDate">Data de Contratação</label>
+          <p-calendar
+            inputId="selectDate"
+            [(ngModel)]="consultancyService.consultancy.data_contratacao"
+            dateFormat="dd/mm/yy"
+            [showTime]="true" 
+            hourFormat="24"
+            [maxDate]="tomorrow"
+            [showButtonBar]="true"
+            appendTo="body"
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            !consultancyService.consultancy.data_contratacao }"
+          ></p-calendar>
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              !consultancyService.consultancy.data_contratacao
+            ">Selecione uma data válida.</small>
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel>
+      <ng-template pTemplate="header">
+        <i class="pi pi-money-bill mx-2"></i>
+        <span>Pagamento</span>
+      </ng-template>
+      <div pFocusTrap class="formgrid grid p-fluid">
+        <div class="field col-12 lg:col">
+          <div class="text-900 mb-3"><b>Valor da assessoria:</b></div>
+          <span class="text-900 mx-3">{{
+            consultancy?.valor_assessoria?.toLocaleString(
+              "pt-BR",
+              { style: "currency", currency: "BRL" }
+            )
+          }}</span>
+        </div>
+        <div class="field col-12 lg:col">
+          <div class="text-900 mb-3"><b>Método de Pagamento:</b></div>
+          <span class="text-900 mx-3">{{
+            consultancy?.tipo_pagamento?.nome
+          }}</span>
+        </div>
+      </div>
+      <div class="formgrid grid p-fluid">
+        <div class="field col-12 lg:col">
+          <div class="text-900 mb-3"><b>Status do Pagamento:</b></div>
+          <span class="text-900 mx-3">{{
+            consultancy?.status_pagamento?.nome
+          }}</span>
+        </div>
+        <div
+          class="field col-12 lg:col"
+          *ngIf="consultancy?.comprovante"
+        >
+          <div class="text-900 mb-3">
+            <b>Comprovante de Pagamento:</b>
+          </div>
+          <span class="text-900 mx-3">
+            <a
+              href="{{
+                consultancy?.comprovante
+              }}"
+              target="_blank"
+              >{{
+                consultancyService.attachmentName(
+                  consultancy?.comprovante
+                )
+              }}</a
+            >
+          </span>
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel *ngIf="
+      consultancyService.consultancy.id_formulario">
+      <ng-template pTemplate="header">
+        <i class="bi bi-card-checklist mx-2"></i>
+        <span>Formulário</span>
+      </ng-template>
+      <div class="formgrid grid p-fluid mb-3">
+        <p-toggleButton 
+          [(ngModel)]="editForm" 
+          [onLabel]="'Editar Formulário'" 
+          [offLabel]="'Editar Formulário'"
+          [onIcon]="'pi pi-lock-open'"
+          offIcon="pi pi-lock" 
+          iconPos="right"
+          />
+      </div>
+      <div pFocusTrap class="formgrid grid p-fluid">
+        <div
+          class="field col-12 lg:col-6"
+          *ngFor="
+            let pergunta of consultancyService.consultancy_view
+              ?.formulario?.perguntas
+          ">
+          <label for="_{{ pergunta.id }}">{{ pergunta.descricao }}</label>
+          <input *ngIf="pergunta.id_tipo == 1"
+            pInputText 
+            id="_{{ pergunta.id }}" 
+            aria-describedby="username-help"
+            [(ngModel)]="pergunta.resposta.descricao"
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.checkQuestion(pergunta) }"
+            [disabled]="!editForm"
+          />
+          <p-calendar *ngIf="pergunta.id_tipo == 2"
+            inputId="_{{ pergunta.id }}"
+            [(ngModel)]="pergunta.resposta.resposta_date"
+            dateFormat="dd/mm/yy"
+            [showButtonBar]="true"
+            appendTo="body"
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.checkQuestion(pergunta) }"
+            [disabled]="!editForm"
+          ></p-calendar>
+          <p-dropdown *ngIf="pergunta.id_tipo == 3"
+            inputId="_{{ pergunta.id }}"
+            [options]="pergunta.respostasDropDown"
+            [(ngModel)]="pergunta.resposta.id_resposta_dropdown"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+            optionLabel="descricao"
+            optionValue="id"
+            placeholder="Selecione..."
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.checkQuestion(pergunta) }"
+            [disabled]="!editForm"
+          ></p-dropdown>
+          <p-multiSelect *ngIf="pergunta.id_tipo == 4"
+            inputId="_{{ pergunta.id }}"
+            [options]="pergunta.respostasDropDown"
+            [ngModel]="pergunta.resposta.id_resposta_multi"
+            optionLabel="descricao"
+            optionValue="id"
+            [showClear]="true"
+            [style]="{'width':'100%'}"
+            appendTo="body"
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.checkQuestion(pergunta) }"
+            [disabled]="!editForm"
+          ></p-multiSelect>
+          <div class="w-full" *ngIf="pergunta.id_tipo == 5">
+            <input
+              #file
+              class="hidden"
+              id="_{{ pergunta.id }}"
+              name="_{{ pergunta.id }}"
+              type="file"
+              [size]="10000000"
+              accept=".pdf, image/*"
+              (change)="onUpload(pergunta, $event)"
+              [disabled]="!editForm"
+            />
+            <div class="flex align-items-center">
+              <p-button 
+                type="button" 
+                (click)="file.click()"
+                [disabled]="!editForm"
+              >
+                Selecionar Arquivo
+              </p-button>
+              <span class="mx-2" *ngIf="pergunta.resposta.caminho_anexo && !pergunta.resposta.resposta_file" >
+                <a
+                  href="{{ pergunta.resposta.caminho_anexo }}"
+                  target="_blank"
+                  >
+                    {{ pergunta.resposta.descricao }}
+                  </a>
+              </span>
+              <span class="mx-2" *ngIf="pergunta.resposta.resposta_file" >
+                <b>Arquivo Selecionado:</b> {{ pergunta.resposta.resposta_file.name }}	
+              </span>
+            </div>
+          </div>
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              consultancyService.checkQuestion(pergunta)
+            ">Resposta corretamente a pergunta.</small>
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel>
+      <ng-template pTemplate="header">
+        <i class="pi pi-bookmark mx-2"></i>
+        <span>Histórico</span>
+      </ng-template>
+      <div class="formgrid grid p-fluid max-h-20rem overflow-y-scroll">
+        <p-timeline [value]="consultancy?.historico" class="w-full">
+          <ng-template pTemplate="content" let-log>
+            <small class="p-text-secondary">{{ log.data_alteracao }}</small>
+          </ng-template>
+          <ng-template pTemplate="opposite" let-log>
+            {{ log.descricao }}
+          </ng-template>
+        </p-timeline>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+  <div class="w-full flex justify-content-end">
+    <p-button
+      label="Salvar Alterações"
+      icon="pi pi-save"
+      iconPos="right"
+      [text]="true"
+      [rounded]="true"
+      (onClick)="check()"
+    ></p-button>
+  </div>
+</p-dialog>
+<!-- Modal de Pendências -->
+<p-dialog
+  [header]="'Pendências da Assessoria'"
+  [modal]="true"
+  [dismissableMask]="false"
+  [closeOnEscape]="false"
+  [(visible)]="visible"
+  [style]="{ width: '50rem' }"
+  (visibleChange)="onVisibleChange($event)"
+  *ngIf="!edit && pendencies"
+>
+  <ng-template pTemplate="header">
+    <div
+      class="inline-flex align-items-center justify-content-center gap-2"
+    >
+      <span class="font-bold white-space-nowrap">
+        Pendências da Assessoria
+        <i class="bi bi-send ml-1"></i>
+        {{ consultancy?.id }}
+      </span>
+    </div>
+  </ng-template>
+  <p-tabView>
+    <p-tabPanel *ngIf="consultancy?.pendencia_pagamento">
+      <ng-template pTemplate="header">
+        <i class="pi pi-money-bill mx-2"></i>
+        <span>Pagamento</span>
+      </ng-template>
+      <div class="formgrid grid p-fluid pb-1">
+        <div class="col-12 sm:col">
+          <div class="text-900 mb-1"><b>Valor da assessoria:</b></div>
+          <span class="text-900 mx-3">{{
+            consultancy?.valor_assessoria?.toLocaleString(
+              "pt-BR",
+              { style: "currency", currency: "BRL" }
+            )
+          }}</span>
+        </div>
+        <div class="col-12 sm:col">
+          <label for="tipo_pagamento">Método de Pagamento</label>
+          <p-dropdown
+            inputId="tipo_pagamento"
+            [options]="consultancyService.paymentTypes"
+            [(ngModel)]="consultancyService.consultancy.id_tipo_pagamento"
+            [required]="true"
+            [style]="{'width':'100%'}"
+            appendTo="body"
+            optionLabel="nome"
+            optionValue="id"
+            placeholder="Selecione..."
+            [tabindex]="1"
+          ></p-dropdown>
+          <small 
+            class="p-error"
+            *ngIf="submitted && consultancyService.consultancy.id_tipo_pagamento == 0"
+          >Informe o método de pagamento.</small>
+        </div>
+      </div>
+      <div class="formgrid grid p-fluid">
+        <div class="col-12" *ngIf="consultancyService.checkPaymentStatus([2])">
+          <div class="grid field" *ngIf="consultancyService.checkPaymentType([1])">
+            <div class="field col-12 lg:col">
+              <p>Método de Pagamento Pix</p>
+            </div>
+          </div>
+          <div class="grid field" *ngIf="consultancyService.checkPaymentType([2,3])">
+            <div class="field col-12">
+              <label for="name">Nome no Cartão</label>
+              <input
+                pInputText
+                id="name"
+                type="text"
+                [(ngModel)]="consultancyService.card.nome"
+                class="text-base text-color surface-overlay border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                [tabIndex]="2"
+              />
+            </div>
+            <div class="field col-12 lg:col">
+              <label for="actionName">Número</label>
+              <input
+                pInputText
+                id="actionName"
+                type="text"
+                [(ngModel)]="consultancyService.card.numero"
+                class="text-base text-color surface-overlay border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+                [tabIndex]="3"
+              />
+            </div>
+            <div class="field col-12 lg:col">
+              <label for="vencimento">Vencimento</label>
+              <p-calendar 
+                [(ngModel)]="consultancyService.card.data" 
+                [iconDisplay]="'input'" 
+                [showIcon]="true" 
+                inputId="vencimento"
+                view="month"
+                dateFormat="mm/y"
+                [readonlyInput]="true"
+                [tabindex]="4"
+              ></p-calendar>
+            </div>
+            <div class="field col-12 lg:col">
+              <label for="cvv">Código de Segurança</label>
+              <p-inputNumber 
+                [(ngModel)]="consultancyService.card.cvv" 
+                inputId="cvv"
+                mode="decimal"
+                [maxlength]="3"
+                [min]="0"
+                [max]="999"
+                [tabindex]="5"
+              ></p-inputNumber>
+            </div>
+            <div class="field col-12" *ngIf="consultancyService.checkPaymentType([2])">
+              <label for="parcel">Parcelamento</label>
+              <p-dropdown
+                inputId="parcel"
+                [required]="true"
+                [style]="{'width':'100%'}"
+                appendTo="body"
+                optionLabel="nome"
+                optionValue="id"
+                placeholder="Selecione..."
+                [tabindex]="6"
+              ></p-dropdown>
+              <small 
+                class="p-error"
+                *ngIf="submitted"
+              >Selecione o parcelamento.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="w-full flex justify-content-end">
+        <p-button
+          label="Realizar Pagamento"
+          icon="pi pi-wallet"
+          iconPos="right"
+          [text]="true"
+          [rounded]="true"
+          (onClick)="checkPayment()"
+        ></p-button>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel *ngIf="consultancy?.pendencia_status && consultancy?.status_assessoria?.id == 2"
+    [disabled]="false">
+      <ng-template pTemplate="header">
+        <i class="bi bi-card-checklist mx-2"></i>
+        <span>Formulário</span>
+      </ng-template>
+      <div class="formgrid grid p-fluid">
+        <div
+          class="field col-12"
+          *ngFor="
+            let pergunta of consultancyService.consultancy_view
+              ?.formulario?.perguntas;
+              let i = index
+          ">
+          <label for="_{{ pergunta.id }}">{{ pergunta.descricao }}</label>
+          <input *ngIf="pergunta.id_tipo == 1"
+            pInputText 
+            id="_{{ pergunta.id }}" 
+            aria-describedby="username-help"
+            [(ngModel)]="pergunta.resposta.descricao"
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.checkQuestion(pergunta) }"
+            [tabindex]="i"
+          />
+          <p-calendar *ngIf="pergunta.id_tipo == 2"
+            inputId="_{{ pergunta.id }}"
+            [(ngModel)]="pergunta.resposta.resposta_date"
+            dateFormat="dd/mm/yy"
+            [showButtonBar]="true"
+            [showIcon]="true"
+            appendTo="body"
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.checkQuestion(pergunta) }"
+            [tabindex]="i"
+          ></p-calendar>
+          <p-dropdown *ngIf="pergunta.id_tipo == 3"
+            inputId="_{{ pergunta.id }}"
+            [options]="pergunta.respostasDropDown"
+            [(ngModel)]="pergunta.resposta.id_resposta_dropdown"
+            [style]="{ width: '100%' }"
+            appendTo="body"
+            optionLabel="descricao"
+            optionValue="id"
+            placeholder="Selecione..."
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.checkQuestion(pergunta) }"
+            [tabindex]="i"
+          ></p-dropdown>
+          <p-multiSelect *ngIf="pergunta.id_tipo == 4"
+            inputId="_{{ pergunta.id }}"
+            [options]="pergunta.respostasDropDown"
+            [ngModel]="pergunta.resposta.id_resposta_multi"
+            optionLabel="descricao"
+            optionValue="id"
+            [showClear]="true"
+            [style]="{'width':'100%'}"
+            appendTo="body"
+            [ngClass]="{'ng-invalid ng-dirty' : submitted &&
+            consultancyService.checkQuestion(pergunta) }"
+            [tabindex]="i"
+          ></p-multiSelect>
+          <div class="w-full" *ngIf="pergunta.id_tipo == 5">
+            <input
+              #file
+              class="hidden"
+              id="_{{ pergunta.id }}"
+              name="_{{ pergunta.id }}"
+              type="file"
+              [size]="10000000"
+              accept=".pdf, image/*"
+              (change)="onUpload(pergunta, $event)"
+            />
+            <div class="flex align-items-center">
+              <p-button 
+                type="button" 
+                (click)="file.click()"
+                [tabindex]="i"
+              >
+                Selecionar Arquivo
+              </p-button>
+              <span class="mx-2" *ngIf="pergunta.resposta.caminho_anexo && !pergunta.resposta.resposta_file" >
+                <a
+                  href="{{ pergunta.resposta.caminho_anexo }}"
+                  target="_blank"
+                  >
+                    {{ pergunta.resposta.descricao }}
+                  </a>
+              </span>
+              <span class="mx-2" *ngIf="pergunta.resposta.resposta_file" >
+                <b>Arquivo Selecionado:</b> {{ pergunta.resposta.resposta_file.name }}	
+              </span>
+            </div>
+          </div>
+          <small
+            class="p-error"
+            *ngIf="
+              submitted &&
+              consultancyService.checkQuestion(pergunta)
+            ">Resposta corretamente a pergunta.</small>
+        </div>
+        <div class="w-full flex justify-content-end">
+          <p-button
+            label="Salvar Respostas"
+            icon="bi bi-floppy"
+            iconPos="right"
+            [text]="true"
+            [rounded]="true"
+            (onClick)="saveAnswers()"
+          ></p-button>
+          <p-button
+            label="Enviar Formulário"
+            icon="bi bi-list-check"
+            iconPos="right"
+            [disabled]="checkAnswers()"
+            [text]="true"
+            [rounded]="true"
+            (onClick)="checkForm()"
+          ></p-button>
+        </div>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+</p-dialog>

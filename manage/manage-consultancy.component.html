@@ -1,0 +1,327 @@
+<div class="grid">
+	<p-confirmPopup></p-confirmPopup>
+	<div class="col-12">
+		<div class="mx-2 py-2">
+			<h4>
+				<i class="bi bi-send-arrow-up"></i>
+				Gerenciamento de Assessorias
+			</h4>
+		</div>
+		<div class="card">
+			<p-table
+				#table
+				dataKey="id"
+				[value]="consultancyService.consultancies"
+				[loading]="consultancyService.loading"
+				[lazy]="true"
+				(onLazyLoad)="consultancyService.loadConsultancies($event)"
+				[paginator]="true"
+				[rows]="10"
+				[totalRecords]="consultancyService.totalRecords"
+				[showCurrentPageReport]="true"
+				currentPageReportTemplate="{first} a {last} de {totalRecords} assesorias(s)"
+				stateStorage="session"
+				stateKey="manage-consultancies"
+				[rowHover]="true"
+				[tableStyle]="{ 'min-width': '50rem' }"
+				[styleClass]="'p-datatable-sm'"
+			>
+				<ng-template pTemplate="header">
+					<tr>
+						<th pSortableColumn="id">
+							Id <p-sortIcon field="id"></p-sortIcon>
+						</th>
+						<th pSortableColumn="tipo_assessoria">
+							Assessoria <p-sortIcon field="tipo_assessoria"></p-sortIcon>
+						</th>
+						<th pSortableColumn="tipo_visto">
+							Tipo do Visto <p-sortIcon field="tipo_visto"></p-sortIcon>
+						</th>
+						<th pSortableColumn="pais">
+							País <p-sortIcon field="pais"></p-sortIcon>
+						</th>
+						<th pSortableColumn="funcionario">
+							Funcionário <p-sortIcon field="funcionario"></p-sortIcon>
+						</th>
+						<th pSortableColumn="cliente">
+							Cliente <p-sortIcon field="cliente"></p-sortIcon>
+						</th>
+						<th pSortableColumn="valor_assessoria">
+							Valor Assessoria <p-sortIcon field="valor_assessoria"></p-sortIcon>
+						</th>
+						<th pSortableColumn="data_contratacao">
+							Data Contratação <p-sortIcon field="data_contratacao"></p-sortIcon>
+						</th>
+						<th pSortableColumn="status">
+							Status <p-sortIcon field="status"></p-sortIcon>
+						</th>
+						<th>Ações</th>
+					</tr>
+					<tr>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="id"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body"
+								pKeyFilter="int"
+							>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="tipo_assessoria"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body" 
+							>
+								<ng-template pTemplate="filter" let-value let-filter="filterCallback">
+									<p-multiSelect
+										inputId="filter_consultancy_type"
+										[options]="consultancyService.consultancyTypes"
+										[ngModel]="value"
+										optionLabel="nome"
+										optionValue="id"
+										(onChange)="filter($event.value)"
+										[showClear]="true"
+										[style]="{ width: '100%' }"
+										appendTo="body"
+									>
+									</p-multiSelect>
+								</ng-template>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="tipo_visto"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body"
+							>
+								<ng-template pTemplate="filter" let-value let-filter="filterCallback">
+									<p-multiSelect
+										inputId="filter_consultancy_visa"
+										[options]="consultancyService.visaTypes"
+										[ngModel]="value"
+										optionLabel="nome"
+										optionValue="id"
+										(onChange)="filter($event.value)"
+										[showClear]="true"
+										[style]="{ width: '100%' }"
+										appendTo="body"
+									>
+									</p-multiSelect>
+								</ng-template>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="pais"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body"
+							>
+								<ng-template pTemplate="filter" let-value let-filter="filterCallback">
+									<p-multiSelect
+										inputId="filter_consultancy_country"
+										[options]="consultancyService.countries"
+										[ngModel]="value"
+										optionLabel="nome"
+										optionValue="id"
+										(onChange)="filter($event.value)"
+										[showClear]="true"
+										[style]="{ width: '100%' }"
+										appendTo="body"
+									>
+										<ng-template let-country pTemplate="item">
+											<div class="flex gap-2 vertical-align-middle">
+												<img [src]="country.codigo" class="flag" style="width: 18px" />
+												<div>{{ country.nome }}</div>
+											</div>
+										</ng-template>
+									</p-multiSelect>
+								</ng-template>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="funcionario"
+								matchMode="contains"
+								[showMenu]="false"
+							>
+								<ng-template pTemplate="filter" let-value let-filter="filterCallback">
+									<p-multiSelect
+										inputId="filter_consultancy"
+										[options]="userService.users"
+										[ngModel]="value"
+										optionLabel="nome_completo"
+										optionValue="id"
+										(onChange)="filter($event.value)"
+										[showClear]="true"
+										[style]="{ width: '100%' }"
+										appendTo="body"
+									>
+										<ng-template let-user pTemplate="item">
+											<div class="flex gap-2 align-items-center">
+												<p-avatar image="{{ user.foto }}" shape="circle" class="mt-1"></p-avatar>
+												<div>{{ user.nome_completo }}</div>
+											</div>
+										</ng-template>
+									</p-multiSelect>
+								</ng-template>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="cliente"
+								matchMode="contains"
+								[showMenu]="false"
+							>
+								<ng-template pTemplate="filter" let-value let-filter="filterCallback" >
+									<p-multiSelect
+										inputId="filter_consultancy"
+										[options]="userService.costumers"
+										[ngModel]="value"
+										optionLabel="nome_completo"
+										optionValue="id"
+										(onChange)="filter($event.value)"
+										[showClear]="true"
+										[style]="{ width: '100%' }"
+										appendTo="body"
+									>
+										<ng-template let-user pTemplate="item">
+											<div class="flex gap-2 align-items-center">
+												<p-avatar image="{{ user.foto }}" shape="circle" class="mt-1"></p-avatar>
+												<div>{{ user.nome_completo }}</div>
+											</div>
+										</ng-template>
+									</p-multiSelect>
+								</ng-template>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="valor_assessoria"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body"
+								pKeyFilter="money"
+								currency="BRL"
+							>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="date"
+								field="data_contratacao"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body"
+							>
+								<ng-template pTemplate="filter" let-value let-filter="filterCallback" >
+									<p-calendar
+										[ngModel]="value"
+										dateFormat="dd/mm/yy"
+										[showButtonBar]="true"
+										(onSelect)="filter($event.toLocaleString())"
+										appendTo="body"
+									></p-calendar>
+								</ng-template>
+							</p-columnFilter>
+						</th>
+						<th>
+							<p-columnFilter
+								type="text"
+								field="status_assessoria"
+								matchMode="contains"
+								[showMenu]="false"
+								pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!" 
+								tooltipPosition="top"
+								appendTo="body"
+							>
+								<ng-template pTemplate="filter" let-value let-filter="filterCallback" >
+									<p-multiSelect
+										[options]="consultancyService.consultancyStatus"
+										[ngModel]="value"
+										optionLabel="nome"
+										optionValue="id"
+										inputId="filter_status"
+										(onChange)="filter($event.value)"
+										[showClear]="true"
+										[style]="{'width':'100%'}"
+										appendTo="body"
+									></p-multiSelect>
+								</ng-template>
+							</p-columnFilter>
+						</th>
+						<th></th>
+					</tr>
+				</ng-template>
+				<ng-template pTemplate="body" let-consultancy>
+					<tr>
+						<td>{{ consultancy.id }}</td>
+						<td>{{ consultancy.tipo_assessoria.nome }}</td>
+						<td>{{ consultancy.tipo_visto?.nome }}</td>
+						<td>
+							<div class="flex gap-2 vertical-align-middle">
+								<img *ngIf="consultancy.pais?.id" [src]="consultancy.pais?.codigo" class="flag" style="width: 18px" />
+								<div>{{ consultancy.pais?.nome }}</div>
+							</div>
+						</td>
+						<td>
+							<div class="flex gap-2 align-items-center">
+								<p-avatar image="{{ consultancy.funcionario.foto }}" shape="circle" class="mt-1"></p-avatar>
+								<div>{{ consultancy.funcionario.nome_completo }}</div>
+							</div>
+						</td>
+						<td>
+							<div class="flex gap-2 align-items-center">
+								<p-avatar image="{{ consultancy.cliente.foto }}" shape="circle" class="mt-1"></p-avatar>
+								<div>{{ consultancy.cliente.nome_completo }}</div>
+							</div>
+						</td>
+						<td>{{ consultancy.valor_assessoria.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) }}</td>
+						<td>{{ consultancyService.formatDate(consultancy.data_contratacao, 1) }}</td>
+						<td>{{ consultancy.status_assessoria.nome }}</td>
+						<td>
+							<div class="flex align-items-center justify-content-center gap-2">
+								<button 
+									pButton 
+									pRipple 
+									type="button" 
+									icon="pi pi-pencil" 
+									class="p-button-rounded p-button-text mr-2"
+									(click)="editConsultancy(consultancy)"
+									></button>
+							</div>
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+			<app-consultancy-modal
+				[consultancy]="consultancyService.consultancy_view!"
+				[(visible)]="showModal"
+				[edit]="true"
+			></app-consultancy-modal>
+		</div>
+	</div>
+</div>

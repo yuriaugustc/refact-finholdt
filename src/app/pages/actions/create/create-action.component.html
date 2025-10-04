@@ -1,0 +1,89 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="mx-2 py-2">
+      <h4>
+        <i class="bi bi-file-earmark-plus"></i>
+        Criar Ação
+      </h4>
+    </div>
+    <div class="card" pFocusTrap>
+      <div class="formgrid grid p-fluid">
+        <div class="field col-12 sm:col-12 md:col-12 lg:col">
+          <label for="actionName">
+            Nome
+            <i
+              class="bi bi-info-circle"
+              role="button"
+              pTooltip="A ação deve possuir um nome único para evitar conflitos no sistema e ambiguidade para o usuário."
+              tooltipPosition="top"
+            ></i>
+          </label>
+          <input
+            pInputText
+            autofocus
+            id="actionName"
+            type="text"
+            [(ngModel)]="action.nome"
+            class="text-base text-color surface-overlay border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+          />
+        </div>
+        <div class="field col-12 sm:col-12 md:col-12 lg:col">
+          <label for="router">Rota:</label>
+          <input
+            pInputText
+            id="router"
+            type="text"
+            [(ngModel)]="action.rota"
+            class="text-base text-color surface-overlay border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+          />
+        </div>
+        <div class="field col-12 sm:col-12 md:col-12 lg:col">
+          <ng-template #tooltipContent>
+            Selecione um ícone de sua preferência do link:
+            <a
+              href="https://icons.getbootstrap.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Bootstrap icons</a
+            >, clique no ícone e copie o que está dentro de "class=".
+          </ng-template>
+          <label for="iconSelect" class="form-label">
+            Selecione o ícone:
+            <i
+              class="bi bi-info-circle"
+              role="button"
+              [pTooltip]="tooltipContent"
+              tooltipPosition="top"
+              [autoHide]="false"
+            ></i>
+          </label>
+          <input
+            pInputText
+            id="iconSelect"
+            type="text"
+            [(ngModel)]="action.icone"
+            class="text-base text-color surface-overlay border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+          />
+        </div>
+				<div class="field col-12 sm:col-12 md:col-12 lg:col">
+          <label for="item">Item a ser vinculado:</label>
+					<p-dropdown
+            id="item"
+						[options]="itemService.items"
+						[filter]="true"
+            [showClear]="true"
+						name="drop"
+						optionLabel="nome"
+						optionValue="id"
+						[(ngModel)]="action.idItem"
+            class="w-full"
+					>
+					</p-dropdown>
+				</div>
+      </div>
+      <div class="flex justify-content-end">
+        <p-button type="button" (click)="createAction()">Criar ação</p-button>
+      </div>
+    </div>
+  </div>
+</div>

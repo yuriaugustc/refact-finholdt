@@ -1,0 +1,275 @@
+<div class="grid">
+	<p-confirmPopup></p-confirmPopup>
+  <div class="col-12">
+    <div class="mx-2 py-2">
+      <h4>
+        <i class="bi bi-collection"></i>
+        Gerenciamento de Formulários
+      </h4>
+    </div>
+    <div class="card">
+      <p-table
+        #table
+        dataKey="id"
+        [value]="formService.forms"
+        [loading]="formService.loading"
+        [lazy]="true"
+        (onLazyLoad)="formService.loadForms($event)"
+        [paginator]="true"
+        [rows]="10"
+        [totalRecords]="formService.totalRecords"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{first} a {last} de {totalRecords} formulário(s)"
+        stateStorage="session"
+        stateKey="crud-questions"
+        [(selection)]="selectedForms"
+        [rowHover]="true"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [styleClass]="'p-datatable-sm'"
+      >
+        <ng-template pTemplate="caption">
+          <div class="flex flex-wrap gap-3 justify-content-start">
+            <p-button
+              pTooltip="Criar novo Formulário"
+              tooltipPosition="top"
+              appendTo="body"
+              icon="pi pi-plus"
+              class="btn"
+              [rounded]="true"
+              [outlined]="true"
+              severity="success"
+              [style]="{ 'border-radius': '10px' }"
+              (click)="openModal({ id: 0 }, 'create')"
+            >
+            </p-button>
+            <p-button
+              pTooltip="Inativar Formulário(s) selecionado(s)"
+              tooltipPosition="top"
+              appendTo="body"
+              icon="pi pi-times"
+              class="btn"
+              (click)="deleteSelectedForms($event)"
+              [rounded]="true"
+              [outlined]="true"
+              severity="danger"
+              [style]="{ 'border-radius': '10px' }"
+              [disabled]="!selectedForms || !selectedForms.length"
+            >
+            </p-button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 4rem">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th pSortableColumn="nome">
+              Nome <p-sortIcon field="nome"></p-sortIcon>
+            </th>
+            <th pSortableColumn="tipo_assessoria">
+              Tipo da Assessoria <p-sortIcon field="tipo_assessoria"></p-sortIcon>
+            </th>
+            <th pSortableColumn="ativo">
+              Ativo <p-sortIcon field="ativo"></p-sortIcon>
+            </th>
+            <th>Ações</th>
+          </tr>
+          <tr>
+            <th></th>
+            <th>
+              <p-columnFilter
+                type="text"
+                field="nome"
+                matchMode="contains"
+                [showMenu]="false"
+                pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!"
+                tooltipPosition="top"
+                appendTo="body"
+              >
+              </p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter
+                type="text"
+                field="tipo"
+                matchMode="equals"
+                [showMenu]="false"
+                pTooltip="Quando estiver pronto, pressione 'Enter' para pesquisar!"
+                tooltipPosition="top"
+                appendTo="body"
+              >
+                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <p-multiSelect
+                    inputId="filter_consultancy_type"
+                    [options]="consultancyService.consultancyTypes"
+                    [ngModel]="value"
+                    optionLabel="nome"
+                    optionValue="id"
+                    (onChange)="filter($event.value)"
+                    [style]="{ width: '100%' }"
+                    appendTo="body"
+                  ></p-multiSelect>
+                </ng-template>
+              </p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter
+                type="boolean"
+                field="ativo"
+                matchMode="equals"
+                [showMenu]="false"
+              >
+              </p-columnFilter>
+            </th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-form>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="form"></p-tableCheckbox>
+            </td>
+            <td>{{ form.nome }}</td>
+            <td>{{ form.tipo_assessoria }}</td>
+            <td>
+              <i
+                class="pi"
+                [ngClass]="
+                  form.ativo == 1
+                    ? 'text-green-500 pi-check-circle text-success'
+                    : 'text-red-500 pi-times-circle text-danger'
+                "
+              ></i>
+            </td>
+            <td>
+              <div class="flex align-items-center justify-content-center gap-2">
+                <button
+                  pButton
+                  pRipple
+                  type="button"
+                  icon="pi pi-pencil"
+                  (click)="openModal(form, 'edit')"
+                  class="p-button-rounded p-button-text mr-2"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <p-dialog
+      styleClass="p-fluid"
+      [style]="{ width: '80rem' }"
+      [(visible)]="showModal"
+      [header]="formService.selectedForm.id ? 'Editar Formulário' : 'Criar Formulário'"
+      [modal]="true"
+      [draggable]="true"
+      [closable]="false"
+      [dismissableMask]="true"
+    >
+      <ng-template pTemplate="content">
+        <div class="field mb-2">
+          <label for="nome">Nome do Formulário</label>
+          <input
+            type="text"
+            pInputText
+            id="nome"
+            [(ngModel)]="formService.selectedForm.nome"
+            required
+            autofocus
+          />
+          <small class="p-error" *ngIf="submitted && !formService.selectedForm.nome"
+            >Descrição do formulário é obrigatória.</small
+          >
+        </div>
+  
+        <div class="field mb-2" *ngIf="!formService.selectedForm.id">
+          <label for="id_tipo_assessoria">Vinculado à assessoria do tipo:</label>
+          <p-dropdown
+            [(ngModel)]="formService.selectedForm.id_tipo_assessoria"
+            inputId="id_tipo_assessoria"
+            [options]="consultancyService.consultancyTypes"
+            appendTo="body"
+            optionLabel="nome"
+            optionValue="id"
+            [required]="true"
+          >
+          </p-dropdown>
+          <small class="p-error" *ngIf="submitted && !formService.selectedForm.id_tipo_assessoria"
+            >Tipo da assessoria é obrigatória.</small
+          >
+        </div>
+        <div class="field mb-2" *ngIf="formService.selectedForm.id">
+          <label for="ativo" class="mx-2">Ativo</label>
+          <p-checkbox
+            [value]="true"
+            inputId="ativo"
+            [binary]="true"
+            [(ngModel)]="formService.selectedForm.ativo"
+          ></p-checkbox>
+        </div>
+        <div class="field my-2">
+          <label>
+            Perguntas do formulário:
+            <i
+              class="bi bi-info-circle"
+              role="button"
+              pTooltip="A ordenação da lista de perguntas do formulário define a ordem em que as perguntas serão apresentadas durante o preenchimento."
+              tooltipPosition="top"
+              appendTo="body"
+            ></i>
+          </label>
+          <p-pickList
+            [source]="formService.questions"
+            [target]="formService.selectedForm.perguntas"
+            sourceHeader="Perguntas disponíveis"
+            [showSourceControls]="false"
+            targetHeader="Perguntas do formulário"
+            [dragdrop]="true"
+            [responsive]="true"
+            [sourceStyle]="{ height: '20rem' }"
+            [targetStyle]="{ height: '20rem' }"
+            filterBy="descricao"
+            sourceFilterPlaceholder="Pesquisar pergunta..."
+            targetFilterPlaceholder="Pesquisar pergunta..."
+            breakpoint="1400px"
+          >
+            <ng-template let-question pTemplate="item">
+              <div class="flex justify-content-between flex-wrap gap-3">
+                <div class="flex-1 flex-column gap-2">
+                  <span class="font-bold">{{ question.descricao }}</span>
+                  <div class="flex gap-2 ml-1">
+                    <small>
+                      <i>{{ question.tipo_pergunta }}</i>
+                    </small>
+                  </div>
+                </div>
+                <div class="font-bold text-900 flex align-items-center">
+                  <i class="bi bi-list"></i>
+                </div>
+              </div>
+            </ng-template>
+          </p-pickList>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Cancelar"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="closeModal()"
+        ></button>
+        <button
+          pButton
+          pRipple
+          label="Salvar"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="onSave()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+  </div>
+</div>

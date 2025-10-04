@@ -1,0 +1,173 @@
+<div class="grid">
+	<div class="col-12">
+		<div pFocusTrap class="card">
+			<div class="p-fluid mb-2">
+				<div class="field">
+					<label for="valor_assessoria">Valor da assessoria</label>
+					<p-inputNumber
+						[(ngModel)]="consultancyService.consultancy.valor_assessoria"
+            pAutoFocus
+            [autofocus]="true"
+						inputId="valor_assessoria"
+						mode="currency"
+						currency="BRL"
+						locale="pt-BR"
+						[min]="0"
+					></p-inputNumber>
+					<small 
+						class="p-error"
+						*ngIf="submitted && consultancyService.consultancy.valor_assessoria == 0"
+          >Informe o valor da assessoria.</small>
+				</div>
+        <div class="field">
+					<label for="tipo_pagamento">Método de Pagamento</label>
+					<p-dropdown
+            inputId="tipo_pagamento"
+            [options]="consultancyService.paymentTypes"
+            [(ngModel)]="consultancyService.consultancy.id_tipo_pagamento"
+            [required]="true"
+            [style]="{'width':'100%'}"
+            appendTo="body"
+            optionLabel="nome"
+            optionValue="id"
+            placeholder="Selecione..."
+          ></p-dropdown>
+					<small 
+						class="p-error"
+						*ngIf="submitted && consultancyService.consultancy.id_tipo_pagamento == 0"
+          >Informe o método de pagamento.</small>
+				</div>
+        <div class="field">
+					<label for="tipo_pagamento">Status do Pagamento</label>
+					<p-dropdown
+            inputId="tipo_pagamento"
+            [options]="consultancyService.paymentStatus"
+            [(ngModel)]="consultancyService.consultancy.id_status_pagamento"
+            [required]="true"
+            [style]="{'width':'100%'}"
+            appendTo="body"
+            optionLabel="nome"
+            optionValue="id"
+            placeholder="Selecione..."
+          ></p-dropdown>
+					<small 
+						class="p-error"
+						*ngIf="submitted && consultancyService.consultancy.id_status_pagamento == 0"
+          >Selecione o status do pagamento.</small>
+				</div>
+        <div class="field" *ngIf="consultancyService.checkPaymentStatus([1])">
+					<label class="block" for="comprovante">Comprovante de Pagamento</label>
+					<input
+						#file
+						class="hidden"
+						id="comprovante"
+						name="comprovante"
+						type="file"
+						[size]="10000000"
+						accept=".pdf, image/*"
+						(change)="consultancyService.onUploadComprovante($event)"
+					/>
+					<div class="flex align-items-center">
+						<p-button 
+							type="button" 
+							(click)="file.click()"
+							>Selecionar Arquivo</p-button>
+						<span class="mx-2" *ngIf="consultancyService.file" >
+							<b>Arquivo Selecionado:</b> {{ consultancyService.file.name }}
+						</span>
+					</div>
+					<small 
+					class="p-error"
+					*ngIf="submitted && consultancyService.checkPaymentStatus([1]) && consultancyService.file == null"
+					>Anexe o comprovante de pagamento.</small>
+				</div>
+				<div class="field" *ngIf="consultancyService.checkPaymentStatus([2])">
+					<div class="grid field" *ngIf="consultancyService.checkPaymentType([1])">
+						<div class="field col-12 lg:col">
+							<p>Método de Pagamento Pix</p>
+						</div>
+					</div>
+					<div class="grid field" *ngIf="consultancyService.checkPaymentType([2,3])">
+						<div class="field col-12">
+							<label for="name">Nome no Cartão</label>
+							<input
+								pInputText
+								id="name"
+								type="text"
+								[(ngModel)]="consultancyService.card.nome"
+								class="text-base text-color surface-overlay border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+							/>
+						</div>
+						<div class="field col-12 lg:col">
+							<label for="actionName">Número</label>
+							<input
+								pInputText
+								id="actionName"
+								type="text"
+								[(ngModel)]="consultancyService.card.numero"
+								class="text-base text-color surface-overlay border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+							/>
+						</div>
+						<div class="field col-12 lg:col">
+							<label for="vencimento">Vencimento</label>
+							<p-calendar 
+								[(ngModel)]="consultancyService.card.data" 
+								[iconDisplay]="'input'" 
+								[showIcon]="true" 
+								inputId="vencimento"
+								view="month"
+								dateFormat="mm/y"
+								[readonlyInput]="true"
+							></p-calendar>
+						</div>
+						<div class="field col-12 lg:col">
+							<label for="cvv">Código de Segurança</label>
+							<p-inputNumber 
+								[(ngModel)]="consultancyService.card.cvv" 
+								inputId="cvv"
+								mode="decimal"
+								[maxlength]="3"
+								[min]="0"
+								[max]="999"
+							></p-inputNumber>
+						</div>
+						<div class="field col-12" *ngIf="consultancyService.checkPaymentType([2])">
+							<label for="parcel">Parcelamento</label>
+							<p-dropdown
+								inputId="parcel"
+								[required]="true"
+								[style]="{'width':'100%'}"
+								appendTo="body"
+								optionLabel="nome"
+								optionValue="id"
+								placeholder="Selecione..."
+							></p-dropdown>
+							<small 
+								class="p-error"
+								*ngIf="submitted"
+							>Selecione o parcelamento.</small>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="w-full flex flex-row-reverse justify-content-between">
+				<p-button
+					label="Próximo"
+					icon="pi pi-chevron-right"
+					iconPos="right"
+					[text]="true"
+					[rounded]="true"
+					(onClick)="check()"
+				></p-button>
+				<p-button
+					label="Anterior"
+					icon="pi pi-chevron-left"
+					iconPos="left"
+					[text]="true"
+					[rounded]="true"
+					(onClick)="consultancyService.secondStep()"
+				></p-button>
+			</div>
+		</div>
+	</div>
+</div>

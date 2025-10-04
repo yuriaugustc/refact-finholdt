@@ -1,0 +1,60 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="mx-2 py-2">
+      <h4>
+        <i class="bi bi-list-ol"></i>
+        Ordenar items do Sistema
+      </h4>
+    </div>
+    <div class="card">
+      <p-table
+        #table
+        dataKey="id"
+        [value]="itemService.items"
+        [rows]="10"
+        stateStorage="session"
+        stateKey="ordernate-items"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [styleClass]="'p-datatable-sm'"
+      >
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-end">
+            <p-button
+              label="Salvar Ordenação Atual"
+              icon="pi pi-save"
+              iconPos="right"
+              [text]="true"
+              [rounded]="true"
+              severity="success"
+              (onClick)="itemService.saveOrdenation()"
+            >
+            </p-button>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem">
+              <i
+                class="bi bi-info-circle"
+                role="button"
+                pTooltip="Utilize este grid para ordenar os itens conforme você deseja que os mesmos sejam mostrados na barra de navegação"
+                tooltipPosition="top"
+              ></i>
+            </th>
+            <th>Nome</th>
+            <th>Icone</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-ri="rowIndex">
+          <tr [pReorderableRow]="ri">
+            <td>
+              <span class="pi pi-bars" pReorderableRowHandle></span>
+            </td>
+            <td>{{ item.nome }}</td>
+            <td>{{ item.icone }} | <i class="{{ item.icone }}"></i></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

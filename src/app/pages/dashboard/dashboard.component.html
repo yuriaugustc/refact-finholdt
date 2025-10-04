@@ -1,0 +1,111 @@
+<div class="grid">
+	<div class="col-12 lg:col-6 xl:col-3">
+		<div class="card mb-0">
+			<div class="flex justify-content-between mb-3">
+				<div>
+					<span class="block text-700 font-medium mb-3">Total de Vendas <small class="text-500">(Últimos 7 dias)</small></span>
+					<div class="text-900 font-medium text-xl">{{ dashBoardService.cardsData?.totalVendasSemana }}</div>
+				</div>
+				<div
+					class="flex align-items-center justify-content-center bg-blue-100 border-round"
+					[ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+				>
+					<i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
+				</div>
+			</div>
+		</div>
+	</div>
+  <div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0">
+      <div class="flex justify-content-between mb-3">
+        <div>
+          <span class="block text-700 font-medium mb-3">Total Vendido <small class="text-500">(Últimos 7 dias)</small></span>
+					<div class="text-900 font-medium text-xl">{{ dashBoardService.cardsData?.totalVendidoSemana?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</div>
+        </div>
+        <div
+          class="flex align-items-center justify-content-center bg-orange-100 border-round"
+          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+        >
+          <i class="pi pi-inbox text-orange-500 text-xl"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+	<div class="col-12 lg:col-6 xl:col-3">
+		<div class="card mb-0">
+			<div class="flex justify-content-between mb-3">
+				<div>
+					<span class="block text-700 font-medium mb-3">Total de Vendas</span>
+					<div class="text-900 font-medium text-xl">{{ dashBoardService.cardsData?.totalVendasTotal }}</div>
+				</div>
+				<div
+					class="flex align-items-center justify-content-center bg-purple-100 border-round"
+					[ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+				>
+					<i class="pi pi-user text-purple-500 text-xl"></i>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-12 lg:col-6 xl:col-3">
+		<div class="card mb-0">
+			<div class="flex justify-content-between mb-3">
+				<div>
+					<span class="block text-700 font-medium mb-3">Total Vendido</span>
+					<div class="text-900 font-medium text-xl">{{ dashBoardService.cardsData?.totalVendidoTotal?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</div>
+				</div>
+				<div
+					class="flex align-items-center justify-content-center bg-green-100 border-round"
+					[ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+				>
+					<i class="pi pi-money-bill text-green-500 text-xl"></i>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-12 xl:col-6">
+		<div class="card">
+			<div class="flex justify-content-between align-items-center mb-5">
+				<h5>Porcentagem de Vendas</h5>
+			</div>
+			<ul class="list-none p-0 m-0">
+				<li *ngFor="let item of dashBoardService.consultancyTypes"
+					class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4"
+				>
+					<div>
+						<span class="text-900 font-medium mr-2 mb-1 md:mb-0"
+							>{{ item.nome }}</span>
+					</div>
+					<div class="mt-2 md:w-4 lg:w-3 flex align-items-center justify-content-between">
+						<div
+							class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem mr-2"
+							[ngStyle]="{ height: '8px' }"
+						>
+							<div
+								class="h-full"
+								[style.backgroundColor]="'var(--primary-color)'"
+								[ngStyle]="{ 'width.%': item.quantidade }"
+							></div>
+						</div>
+						<span 
+							class="flex align-items-end font-medium ml-2"
+							[style.color]="'var(--primary-color)'"
+						>{{ item.quantidade }}%</span>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="col-12 xl:col-6">
+		<div class="card">
+			<h5>Índice de Vendas <small class="text-500">(últimos 7 dias)</small></h5>
+			<p-chart
+				type="line"
+				[data]="chartData"
+				[options]="chartOptions"
+			></p-chart>
+		</div>
+	</div>
+</div>
